@@ -7,6 +7,8 @@ import SearchBox from "./SearchBox";
 export default function Dashboard({user, setUser}){
     const navigate=useNavigate()
     const [username, setUsername]=useState("")
+    const [chatUser, setChatUser]=useState(null) //the user i am chatting with
+
     function signOutButton(){
         signOut(auth).then(() => {
             console.log("Signed out")
@@ -41,17 +43,23 @@ export default function Dashboard({user, setUser}){
     console.log(user)
     return <div className="w-full h-full flex ">
         <span className="w-1/4 h-full">
-        <SearchBox/>
+        <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>
         </span>
         <span className="flex justify-between flex-col w-3/4 h-full">
-            <p>Dashboard</p>
-            
+            <span className="w-full h-1/4 border">
+                <p>Dashboard</p>
                 <p>{user? user.displayName:"null"}</p>
                 <p>{user?user.email:"null"}</p>
                 <p>username:{user?user.username:"null"}</p>
                 <img className="w-12 h-12" src={user?user.photoURL:"#"} alt="pfp"/>
-            <input placeholder="username" onChange={(e)=>setUsername(e.target.value)}/><button onClick={()=>update(ref(db, `users/${user.uid}`),{username:username})}>Save</button>
-            <button onClick={signOutButton}>Sign out</button>
+                <input placeholder="username" onChange={(e)=>setUsername(e.target.value)}/><button onClick={()=>update(ref(db, `users/${user.uid}`),{username:username})}>Save</button>
+                <button onClick={signOutButton}>Sign out</button>
+            </span>
+            {chatUser && <span className="w-full h-3/4 ">
+            <p>Chat with {chatUser?chatUser.displayName:null}</p>
+
+            
+            </span>}
         </span>
     </div>
 }   

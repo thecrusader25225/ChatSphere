@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 export default function App(){
   const [isSignedIn, setIsSignedIn]=useState(false);
   const [user, setUser]=useState(null);
-  return <div className="w-screen h-screen bg-black text-white text-3xl">
+  return <div className="w-screen h-screen bg-black text-white text-xl">
     <BrowserRouter>
     <Routes>
       <Route path="/" element={<Dashboard isSignedIn={isSignedIn} user={user} setUser={setUser}/>}/>
