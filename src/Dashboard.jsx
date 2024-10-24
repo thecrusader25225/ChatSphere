@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase-config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { onValue, push, ref, set, update } from "firebase/database";
+import { get, onValue, push, query, ref, set, update } from "firebase/database";
 import { useEffect, useState } from "react";
 import SearchBox from "./SearchBox";
+import Friends from "./Friends";
 export default function Dashboard({user, setUser}){
     const navigate=useNavigate()
     const [username, setUsername]=useState("")
@@ -73,10 +74,20 @@ export default function Dashboard({user, setUser}){
         console.log("all msgs",allMesseges)
     },[messege, chatUser])
 
+    function addFriend(){
+        get(query(ref(db, `users/${user.uid}/friends/${chatUser.uid}`))).then(snapshot=>{
+            if(!snapshot.exists())
+                set(ref(db, `users/${user.uid}/friends/${chatUser.uid}`), {
+                    ...chatUser
+                })
+        })
+    }
+
 
     return <div className="w-full h-full flex ">
-        <span className="w-1/4 h-full">
-        <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>
+        <span className="w-1/4 h-full flex flex-col">
+        <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>   
+        <Friends user={user} chatUser={chatUser} setChatUser={setChatUser} setAllMesseges={setAllMesseges} allMesseges={allMesseges} messege={messege}/>
         </span>
         <span className="flex justify-between flex-col w-3/4 h-full">
             <span className="w-full h-1/4 border">
@@ -91,6 +102,7 @@ export default function Dashboard({user, setUser}){
             {chatUser && 
             <span className="w-full h-3/4 flex flex-col justify-between">
                 <p>Chat with {chatUser?chatUser.displayName:null}</p>
+                <button onClick={addFriend}>Add Friend</button>
                 <span className="w-full h-full border">
                 {
                     allMesseges && Object.values(allMesseges).map(

@@ -15,7 +15,7 @@ export default function SearchBox({chatUser, setChatUser, user}){
             }
         })
     }
-    function chatRoom(){
+    function chatRoom(userdata){
         setChatUser(userdata)
         const roomName=userdata.uid>user.uid?userdata.uid+'_'+user.uid:user.uid+'_'+userdata.uid; //to create unique chat rooms
         
@@ -32,11 +32,11 @@ export default function SearchBox({chatUser, setChatUser, user}){
         })
     }
     console.log("search user data ", userdata)
-    return <div className="w-full h-full border flex flex-col">
+    return <div className="w-full h-1/3 border flex flex-col">
         <input type="text" className="bg-transparent" onChange={e=>setUsername(e.target.value)}/>
         <button onClick={searchUser}>Search</button>
         {userdata &&
-            <button className="flex flex-col" onClick={chatRoom}>
+            <button className="flex flex-col" onClick={()=>chatRoom(userdata)}>
                 <p>{userdata.displayName}</p>
                 <p>{userdata.username}</p>
             </button>
