@@ -3,6 +3,7 @@ import { auth, db } from "../firebase-config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { onValue, ref, set, update } from "firebase/database";
 import { useEffect, useState } from "react";
+import SearchBox from "./SearchBox";
 export default function Dashboard({user, setUser}){
     const navigate=useNavigate()
     const [username, setUsername]=useState("")
@@ -38,8 +39,11 @@ export default function Dashboard({user, setUser}){
         })
     }
     console.log(user)
-    return <div className="w-full h-full">
-        <span className="flex justify-between flex-col">
+    return <div className="w-full h-full flex ">
+        <span className="w-1/4 h-full">
+        <SearchBox/>
+        </span>
+        <span className="flex justify-between flex-col w-3/4 h-full">
             <p>Dashboard</p>
             
                 <p>{user? user.displayName:"null"}</p>
