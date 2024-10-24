@@ -20,10 +20,11 @@ export default function SearchBox({chatUser, setChatUser, user}){
         const roomName=userdata.uid>user.uid?userdata.uid+'_'+user.uid:user.uid+'_'+userdata.uid; //to create unique chat rooms
         
         //check if it exists already
-        get(query(ref(db, `users/${user.uid}/${roomName}`))).then(snapshot=>{
+        get(query(ref(db, `rooms/${roomName}`))).then(snapshot=>{
             if(!snapshot.exists()){
-                set(ref(db, `users/${user.uid}/${roomName}`), {
-                    chatUser:userdata?.uid
+                set(ref(db, `rooms/${roomName}`), {
+                    user1:userdata?.uid,
+                    user2:user?.uid
                 })
                 console.log("Chat room created")
             }
