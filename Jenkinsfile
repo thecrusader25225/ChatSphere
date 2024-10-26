@@ -26,6 +26,7 @@ pipeline {
                 label 'docker-agent' // Using the same agent for Docker push
             }
             steps {
+                sh 'docker login -u shane25225 -p __sh.a.ne__'
                 sh 'docker push shane25225/chat-sphere:latest' // Push the Docker image to Docker Hub
             }
         }
