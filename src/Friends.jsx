@@ -39,10 +39,14 @@ export default function Friends({ user, setChatUser, chatUser, setAllMesseges })
     return (
         <div className="w-full h-2/3 flex flex-col border">
             <p>Friends</p>
-            {allFriends && Object.values(allFriends).map(friend => (
-                <button key={friend.uid} onClick={() => setChatUser(friend)}>
-                    {friend.displayName}
+            {allFriends && Object.values(allFriends).map(friend => (<>
+                <button key={friend.uid} onClick={() => setChatUser(friend)} className="b">
+                    <img src={friend.photoURL} className="w-12 h-12 rounded-full" alt="pfp"/>
+                    <p>{friend.displayName}</p>
                 </button>
+                <div className="hbar"/>
+                </>
+
             ))}
         </div>
     );

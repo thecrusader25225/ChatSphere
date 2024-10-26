@@ -1,6 +1,7 @@
 import { equalTo, get, orderByChild, query, ref, set, update } from "firebase/database"
 import { useState } from "react"
 import { db } from "../firebase-config"
+import SearchInput from "./SearchInput"
 
 export default function SearchBox({chatUser, setChatUser, user}){
     const [username, setUsername]=useState("")
@@ -32,11 +33,12 @@ export default function SearchBox({chatUser, setChatUser, user}){
         })
     }
     console.log("search user data ", userdata)
-    return <div className="w-full h-1/3 border flex flex-col">
-        <input type="text" className="bg-transparent" onChange={e=>setUsername(e.target.value)}/>
-        <button onClick={searchUser}>Search</button>
+    return <div className="w-full h-1/3 border flex flex-col p-4">
+        <SearchInput setUsername={setUsername}/>
+        <button onClick={searchUser} className="b flex justify-center">Search</button>
+        <div className="hbar"/>
         {userdata &&
-            <button className="flex flex-col" onClick={()=>chatRoom(userdata)}>
+            <button className="flex flex-col b" onClick={()=>chatRoom(userdata)}>
                 <p>{userdata.displayName}</p>
                 <p>{userdata.username}</p>
             </button>

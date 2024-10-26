@@ -2,27 +2,18 @@ import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase-config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { get, onValue, push, query, ref, set, update } from "firebase/database";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SearchBox from "./SearchBox";
 import Friends from "./Friends";
+import Navbar from "./Navbar";
 export default function Dashboard({user, setUser}){
     const navigate=useNavigate()
     const [username, setUsername]=useState("")
     const [chatUser, setChatUser]=useState(null) //the user i am chatting with
     const [messege, setMessege]=useState("")
     const [allMesseges, setAllMesseges]=useState([])
-
-    function signOutButton(){
-        signOut(auth).then(() => {
-            console.log("Signed out")
-            navigate("/signup")
-            // Sign-out successful.
-          }).catch((error) => {
-            console.error(error)
-            // An error happened.
-          });
-          
-    }
+    const [isMessegeSent, setIsMessegeSent]=useState(false)
+   
     useEffect(()=>{
         const unsubscribe=onAuthStateChanged(auth, currentUser=>{
             if(currentUser){
@@ -59,6 +50,7 @@ export default function Dashboard({user, setUser}){
             messegeId:msgId.key
         })
         setMessege("")
+        setIsMessegeSent(true)
     }
     useEffect(()=>{
         if (!chatUser) {
@@ -83,8 +75,21 @@ export default function Dashboard({user, setUser}){
         })
     }
 
+    const targetRef=useRef(null)
+    const scrollToDiv = () => {
+        if(targetRef.current)
+        targetRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    useEffect(() => {
+        if(isMessegeSent){
+            scrollToDiv();
+            setIsMessegeSent(false)
+        }
+    }, [allMesseges]);
 
-    return <div className="w-full h-full flex ">
+    return <>
+      <Navbar username={username} setUsername={setUsername} user={user}/>
+    <div className="w-full h-full flex pt-16">
         <span className="w-1/4 h-full flex flex-col">
         <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>   
         <Friends user={user} chatUser={chatUser} setChatUser={setChatUser} setAllMesseges={setAllMesseges} allMesseges={allMesseges} messege={messege}/>
@@ -92,34 +97,47 @@ export default function Dashboard({user, setUser}){
         <span className="flex justify-between flex-col w-3/4 h-full">
             <span className="w-full h-1/4 border">
                 <p>Dashboard</p>
-                <p>{user? user.displayName:"null"}</p>
-                <p>{user?user.email:"null"}</p>
-                <p>username:{user?user.username:"null"}</p> 
-                <img className="w-12 h-12" src={user?user.photoURL:"#"} alt="pfp"/>
-                <input placeholder="username" onChange={(e)=>setUsername(e.target.value)}/><button onClick={()=>update(ref(db, `users/${user.uid}`),{username:username})}>Save</button>
-                <button onClick={signOutButton}>Sign out</button>
+                
             </span>
             {chatUser? 
-            <span className="w-full h-3/4 flex flex-col justify-between">
+            <span className="w-full h-3/4 flex flex-col justify-between items-center">
                 <p>Chat with {chatUser?chatUser.displayName:null}</p>
                 <button onClick={addFriend}>Add Friend</button>
-                <span className="w-full h-full border">
+                <span className="w-full h-3/4 border border-red-600 overflow-y-auto">
                 {
                     allMesseges && Object.values(allMesseges).map(
-                        msg=><div key={msg.messegeId} className="border flex flex-col">
-                            <span>
-                                <p>{msg.text}</p>
-                                <p className="text-sm">{new Date(msg.timestamp).toLocaleTimeString()}</p>
-                            </span>
+                        msg=><><div key={msg.messegeId} className=" flex flex-col justify-center py-2">
+                            {
+                                msg.sender == user.uid?
+                                <span className="flex justify-end w-full">
+                                    <span className="flex flex-col">
+                                        <p className="text">{msg.text}</p>
+                                        <p className="text-xs text-end">{new Date(msg.timestamp).toLocaleTimeString()}</p>
+                                    </span>
+                                    <img src={user.photoURL} alt="sender image" className="w-12 h-12 rounded-full"/>
+                                </span>:
+                                 <span className="flex">
+                                    <img src={chatUser.photoURL} alt="sender image" className="w-12 h-12 rounded-full"/>
+                                    <span className="flex flex-col">
+                                        <p className="text">{msg.text}</p>
+                                        <p className="text-xs">{new Date(msg.timestamp).toLocaleTimeString()}</p>
+                                    </span>
+                                </span>
+                            }
                         </div>
-                    )
+                        </>
+                    )   
+                    
                 }
+                
+                <div ref={targetRef}/>
+               
                 </span>
-                <span className="flex border">
-                    <input type="text" className="bg-transparent" onChange={e=>setMessege(e.target.value)}/>
-                    <button onClick={sendmessege}>Send</button>
+                <span className="flex border w-full h-16 items-center justify-center backdrop-blur-lg">
+                    <input type="text" className="bg-transparent border w-3/4 h-10" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
+                    <button onClick={()=>{sendmessege();}}>Send</button>
                 </span>
-            
+                
             </span>:
             <span className="w-full h-3/4 flex">
                 <p>Select a chat</p>
@@ -127,4 +145,5 @@ export default function Dashboard({user, setUser}){
             }
         </span>
     </div>
+    </>
 }   
