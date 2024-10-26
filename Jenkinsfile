@@ -26,10 +26,11 @@ pipeline {
                 label 'docker-agent' // Using the same agent for Docker push
             }
             steps {
-                sh 'docker login -u shane25225 -p __sh.a.ne__'
-                sh 'docker push shane25225/chat-sphere:latest' // Push the Docker image to Docker Hub
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin' // Login to Docker Hub
+                    sh 'docker push shane25225/chat-sphere:latest' // Push the Docker image to Docker Hub
+                }
             }
         }
-
     }
 }
