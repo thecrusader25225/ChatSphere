@@ -6,11 +6,8 @@ pipeline {
     stages {
         stage('Build') {
             agent {
-                // label 'build-agent' // Using a specific agent for the build stage
-                  docker {
-                    image 'node:16-alpine' // The base image for Node.js
-                    args '-u root:root' // Optional: run as root if you need permissions for certain commands
-                }
+                label 'build-agent' // Using a specific agent for the build stage
+                
             }
             steps {
                 sh 'npm install' // Install dependencies
