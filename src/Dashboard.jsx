@@ -99,7 +99,7 @@ export default function Dashboard({user, setUser}){
                 <input placeholder="username" onChange={(e)=>setUsername(e.target.value)}/><button onClick={()=>update(ref(db, `users/${user.uid}`),{username:username})}>Save</button>
                 <button onClick={signOutButton}>Sign out</button>
             </span>
-            {chatUser && 
+            {chatUser? 
             <span className="w-full h-3/4 flex flex-col justify-between">
                 <p>Chat with {chatUser?chatUser.displayName:null}</p>
                 <button onClick={addFriend}>Add Friend</button>
@@ -107,7 +107,10 @@ export default function Dashboard({user, setUser}){
                 {
                     allMesseges && Object.values(allMesseges).map(
                         msg=><div key={msg.messegeId} className="border flex flex-col">
-                            <p>{msg.text}</p>
+                            <span>
+                                <p>{msg.text}</p>
+                                <p className="text-sm">{new Date(msg.timestamp).toLocaleTimeString()}</p>
+                            </span>
                         </div>
                     )
                 }
@@ -117,7 +120,11 @@ export default function Dashboard({user, setUser}){
                     <button onClick={sendmessege}>Send</button>
                 </span>
             
-            </span>}
+            </span>:
+            <span className="w-full h-3/4 flex">
+                <p>Select a chat</p>
+            </span>
+            }
         </span>
     </div>
 }   
