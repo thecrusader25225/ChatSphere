@@ -103,7 +103,7 @@ export default function Dashboard({user, setUser}){
             <span className="w-full h-3/4 flex flex-col justify-between items-center">
                 <p>Chat with {chatUser?chatUser.displayName:null}</p>
                 <button onClick={addFriend}>Add Friend</button>
-                <span className="w-full h-3/4 border border-red-600 overflow-y-auto">
+                <span className="w-full h-3/4 border overflow-y-auto">
                 {
                     allMesseges && Object.values(allMesseges).map(
                         msg=><div key={msg.messegeId} className=" flex flex-col justify-center py-2">
