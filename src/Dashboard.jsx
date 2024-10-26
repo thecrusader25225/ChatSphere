@@ -106,7 +106,7 @@ export default function Dashboard({user, setUser}){
                 <span className="w-full h-3/4 border border-red-600 overflow-y-auto">
                 {
                     allMesseges && Object.values(allMesseges).map(
-                        msg=><><div key={msg.messegeId} className=" flex flex-col justify-center py-2">
+                        msg=><div key={msg.messegeId} className=" flex flex-col justify-center py-2">
                             {
                                 msg.sender == user.uid?
                                 <span className="flex justify-end w-full">
@@ -125,7 +125,7 @@ export default function Dashboard({user, setUser}){
                                 </span>
                             }
                         </div>
-                        </>
+                
                     )   
                     
                 }
