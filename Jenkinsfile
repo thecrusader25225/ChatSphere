@@ -7,7 +7,6 @@ pipeline {
         stage('Build') {
             agent {
                 label 'build-agent' // Using a specific agent for the build stage
-                
             }
             steps {
                 sh 'npm install' // Install dependencies
@@ -19,7 +18,7 @@ pipeline {
             }
             steps {
                 sh 'echo "build started"' // Log message indicating build start
-                sh 'docker build -t chat-sphere:latest .' // Build the Docker image
+                sh 'docker build -t shane25225/chat-sphere:latest .' // Build the Docker image
             }
         }
         stage('Docker Push') {
@@ -27,11 +26,9 @@ pipeline {
                 label 'docker-agent' // Using the same agent for Docker push
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin' // Login to Docker Hub
-                    sh 'docker push chat-sphere:latest' // Push the Docker image to Docker Hub
-                }
+                sh 'docker push shane25225/chat-sphere:latest' // Push the Docker image to Docker Hub
             }
         }
+
     }
 }
