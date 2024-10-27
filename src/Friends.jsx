@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { ref } from "firebase/database";
 import { db } from "../firebase-config";
 
-export default function Friends({ user, setChatUser, chatUser, setAllMesseges }) {
-    const [allFriends, setAllFriends] = useState(null);
+export default function Friends({ user, setChatUser, chatUser, setAllMesseges, setIsChatOpened, allFriends, setAllFriends }) {
+   
 
     // Fetch friends data from the database
     useEffect(() => {
@@ -27,6 +27,7 @@ export default function Friends({ user, setChatUser, chatUser, setAllMesseges })
         const unsubscribe = onValue(ref(db, `rooms/${roomName}/messeges/`), snapshot => {
             if (snapshot.exists()) {
                 setAllMesseges(snapshot.val());
+                setIsChatOpened(true)
             } else {
                 console.log("No messages found");
                 setAllMesseges([]); // Clear messages if none found
@@ -40,7 +41,7 @@ export default function Friends({ user, setChatUser, chatUser, setAllMesseges })
         <div className="w-full h-2/3 flex flex-col border">
             <p>Friends</p>
             {allFriends && Object.values(allFriends).map(friend => (<>
-                <button key={friend.uid} onClick={() => setChatUser(friend)} className="b">
+                <button key={friend.uid} onClick={() =>{ setChatUser(friend);}} className="b">
                     <img src={friend.photoURL} className="w-12 h-12 rounded-full" alt="pfp"/>
                     <p>{friend.displayName}</p>
                 </button>

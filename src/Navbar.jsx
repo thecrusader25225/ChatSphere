@@ -43,11 +43,11 @@ export default function Navbar({user, username, setUsername}){
                 <legend className="text-sm">Username</legend>
                 {isEditingUsername?
                     <><input placeholder="username" onChange={(e)=>setUsername(e.target.value)} className="w-3/4 bg-transparent outline-none rounded-full"/>
-                    <TiTick className="hover:bg-white hover:bg-opacity-10 cursor-pointer p-2 text-3xl rounded-full duration-200" onClick={()=>{update(ref(db, `users/${user.uid}`),{username:username}); setIsEditingUsername(false)}}/>
-                    <CgClose className="hover:bg-white hover:bg-opacity-10 cursor-pointer p-2 text-3xl rounded-full duration-200" onClick={()=>setIsEditingUsername(false)}/>
+                    <TiTick className="sb" onClick={()=>{update(ref(db, `users/${user.uid}`),{username:username}); setIsEditingUsername(false)}}/>
+                    <CgClose className="sb" onClick={()=>setIsEditingUsername(false)}/>
                     </>:
                     <><p className="text-base">@{user?user.username:"null"}</p> 
-                    <BiEdit className="hover:bg-white hover:bg-opacity-10 cursor-pointer p-2 text-3xl rounded-full duration-200" onClick={()=>setIsEditingUsername(true)}/>  
+                    <BiEdit className="sb" onClick={()=>setIsEditingUsername(true)}/>  
                     </> }
             </fieldset>
             <button className="hover:underline py-2" onClick={signOutButton}>Sign out</button>

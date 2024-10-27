@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 .sb{
-    @apply hover:bg-white hover:bg-opacity-10 cursor-pointer p-3 text-5xl rounded-full duration-200
+    @apply  hover:bg-white hover:bg-opacity-10 cursor-pointer p-2 text-3xl rounded-full duration-200
 }
 .b{
-    @apply hover:bg-white hover:bg-opacity-10 cursor-pointer px-8 py-1 text-lg duration-200 rounded-full flex  items-center w-full
+    @apply hover:bg-white hover:bg-opacity-10 cursor-pointer px-8 py-1 text-lg duration-200 rounded-lg flex  items-center w-full
 }
 .hbar{
     @apply w-11/12 h-0.5 rounded-full bg-white self-center

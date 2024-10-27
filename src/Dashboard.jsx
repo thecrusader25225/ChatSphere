@@ -6,6 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import SearchBox from "./SearchBox";
 import Friends from "./Friends";
 import Navbar from "./Navbar";
+import { FaUserFriends } from "react-icons/fa";
+import { CgAdd } from "react-icons/cg";
+import { BiPlus } from "react-icons/bi";
+import { TiTick } from "react-icons/ti";
 export default function Dashboard({user, setUser}){
     const navigate=useNavigate()
     const [username, setUsername]=useState("")
@@ -13,7 +17,9 @@ export default function Dashboard({user, setUser}){
     const [messege, setMessege]=useState("")
     const [allMesseges, setAllMesseges]=useState([])
     const [isMessegeSent, setIsMessegeSent]=useState(false)
-   
+    const [isChatOpened, setIsChatOpened]=useState(false)
+    const [allFriends, setAllFriends] = useState(null);
+
     useEffect(()=>{
         const unsubscribe=onAuthStateChanged(auth, currentUser=>{
             if(currentUser){
@@ -81,29 +87,48 @@ export default function Dashboard({user, setUser}){
         targetRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
     useEffect(() => {
-        if(isMessegeSent){
-            scrollToDiv();
-            setIsMessegeSent(false)
+        if (isMessegeSent || isChatOpened) {
+            // Use a timeout to ensure the chat is rendered before scrolling
+            setTimeout(() => {
+                scrollToDiv();
+                if (isMessegeSent) setIsMessegeSent(false);
+                if (isChatOpened) setIsChatOpened(false);
+            }, 100); // You can adjust the timeout if needed
         }
-    }, [allMesseges]);
+    }, [allMesseges, chatUser]); // Make sure to include `allMesseges` in the dependency array
+    
 
     return <>
       <Navbar username={username} setUsername={setUsername} user={user}/>
     <div className="w-full h-full flex pt-16">
         <span className="w-1/4 h-full flex flex-col">
         <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>   
-        <Friends user={user} chatUser={chatUser} setChatUser={setChatUser} setAllMesseges={setAllMesseges} allMesseges={allMesseges} messege={messege}/>
+        <Friends user={user} chatUser={chatUser} setChatUser={setChatUser} setAllMesseges={setAllMesseges} allMesseges={allMesseges} messege={messege} setIsChatOpened={setIsChatOpened} allFriends={allFriends} setAllFriends={setAllFriends}/>
         </span>
         <span className="flex justify-between flex-col w-3/4 h-full">
-            <span className="w-full h-1/4 border">
-                <p>Dashboard</p>
-                
-            </span>
+           
             {chatUser? 
-            <span className="w-full h-3/4 flex flex-col justify-between items-center">
-                <p>Chat with {chatUser?chatUser.displayName:null}</p>
-                <button onClick={addFriend}>Add Friend</button>
-                <span className="w-full h-3/4 border overflow-y-auto">
+            <>
+            <span className="w-full h-full flex flex-col justify-between items-center">
+                <span className="w-full h-16 border flex justify-between items-center">
+                    <span className="flex items-center">
+                        <img src={chatUser?.photoURL? chatUser.photoURL : ""} alt="sender image" className="w-12 h-12 rounded-full"/>
+                        <p>{chatUser?chatUser.displayName:null}</p>
+                    </span>  
+                  
+                        {allFriends && Object.values(allFriends).some(frnd=>frnd.uid==chatUser.uid)?
+                          <span className="flex sb">
+                            <FaUserFriends className="text-lg"/>
+                            <TiTick className="text-lg"/>
+                        </span>: <span className="flex sb" onClick={addFriend}>
+                        <FaUserFriends className="text-lg"/>
+                        <BiPlus className="text-lg"/>
+                        </span>
+                        }
+                    </span>
+                
+                
+                <span className="w-full h-full border overflow-y-auto">
                 {
                     allMesseges && Object.values(allMesseges).map(
                         msg=><div key={msg.messegeId} className=" flex flex-col justify-center py-2">
@@ -125,20 +150,15 @@ export default function Dashboard({user, setUser}){
                                 </span>
                             }
                         </div>
-                
                     )   
-                    
                 }
-                
                 <div ref={targetRef}/>
-               
                 </span>
                 <span className="flex border w-full h-16 items-center justify-center backdrop-blur-lg">
                     <input type="text" className="bg-transparent border w-3/4 h-10" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
                     <button onClick={()=>{sendmessege();}}>Send</button>
                 </span>
-                
-            </span>:
+            </span></>:
             <span className="w-full h-3/4 flex">
                 <p>Select a chat</p>
             </span>
