@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase-config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { get, onValue, push, query, ref, set, update } from "firebase/database";
+import { get, onValue, push, query, ref, remove, set, update } from "firebase/database";
 import { useEffect, useRef, useState } from "react";
 import SearchBox from "./SearchBox";
 import Friends from "./Friends";
@@ -73,11 +73,19 @@ export default function Dashboard({user, setUser}){
     },[messege, chatUser])
 
     function addFriend(){
-        get(query(ref(db, `users/${user.uid}/friends/${chatUser.uid}`))).then(snapshot=>{
+        const reference=ref(db, `users/${user.uid}/friends/${chatUser.uid}`)
+        get(query(reference)).then(snapshot=>{
             if(!snapshot.exists())
-                set(ref(db, `users/${user.uid}/friends/${chatUser.uid}`), {
+                set(reference, {
                     ...chatUser
                 })
+        })
+    }
+    function removeFriend(){
+        const reference=ref(db, `users/${user.uid}/friends/${chatUser.uid}`)
+        get(query(reference)).then(snapshot=>{
+            if(snapshot.exists())
+                remove(reference)
         })
     }
 
@@ -117,7 +125,7 @@ export default function Dashboard({user, setUser}){
                     </span>  
                   
                         {allFriends && Object.values(allFriends).some(frnd=>frnd.uid==chatUser.uid)?
-                          <span className="flex sb">
+                          <span className="flex sb" onClick={removeFriend}>
                             <FaUserFriends className="text-lg"/>
                             <TiTick className="text-lg"/>
                         </span>: <span className="flex sb" onClick={addFriend}>
