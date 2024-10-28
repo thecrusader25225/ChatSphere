@@ -2,6 +2,7 @@ import { onValue } from "firebase/database";
 import { useEffect, useState } from "react";
 import { ref } from "firebase/database";
 import { db } from "../firebase-config";
+import { toast } from "react-toastify";
 
 export default function Friends({ user, setChatUser, chatUser, setAllMesseges, setIsChatOpened, allFriends, setAllFriends }) {
    

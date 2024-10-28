@@ -75,10 +75,18 @@ export default function Dashboard({user, setUser}){
     function addFriend(){
         const reference=ref(db, `users/${user.uid}/friends/${chatUser.uid}`)
         get(query(reference)).then(snapshot=>{
-            if(!snapshot.exists())
+            if(!snapshot.exists()){
+                const userData = {
+                    uid: chatUser.uid,
+                    displayName: chatUser.displayName,
+                    photoURL: chatUser.photoURL,
+                    // Add any other fields you deem necessary
+                };
                 set(reference, {
-                    ...chatUser
+                    ...userData
                 })
+            }
+                
         })
     }
     function removeFriend(){
@@ -88,6 +96,58 @@ export default function Dashboard({user, setUser}){
                 remove(reference)
         })
     }
+    function checkStranger() {
+        const roomName = chatUser.uid > user.uid ? `${chatUser.uid}_${user.uid}` : `${user.uid}_${chatUser.uid}`;
+    
+        // Get the messages from the room
+        get(ref(db, `rooms/${roomName}/messeges/`)).then(snapshot => {
+            if (snapshot.exists()) {
+                const messages = snapshot.val();
+                const messageCount = Object.keys(messages).length; // Count the number of messages
+    
+                console.log("Message count:", messageCount); // Debugging log
+    
+                // Check if the user is a friend
+                get(query(ref(db, `users/${chatUser.uid}/friends/${user.uid}`))).then(friendSnapshot => {
+                    const isFriend = friendSnapshot.exists();
+                    console.log("Is friend:", isFriend); // Debugging log
+    
+                    if (!isFriend && messageCount <= 1) { // Adjusted condition
+                        const notificationRef = ref(db, `users/${chatUser.uid}/notifications/${user.uid}`);
+    
+                        // Check if notification already exists
+                        get(notificationRef).then(notificationSnapshot => {
+                            if (!notificationSnapshot.exists()) {
+                                const notificationData = {
+                                    uid: user.uid,
+                                    displayName: user.displayName,
+                                    photoURL: user.photoURL,
+                                    // Add any other fields you deem necessary
+                                };
+                                
+                                set(notificationRef, { ...notificationData }) // Add user as notification
+                                    .then(() => console.log("Notification set successfully."))
+                                    .catch(error => console.error("Error setting notification:", error));
+                            } else {
+                                console.log("Notification already exists.");
+                            }
+                        }).catch(error => {
+                            console.error("Error checking notifications:", error);
+                        });
+                    } else {
+                        console.log("Not sending notification.");
+                    }
+                }).catch(error => {
+                    console.error("Error checking friends:", error);
+                });
+            } else {
+                console.log("No messages found in the room.");
+            }
+        }).catch(error => {
+            console.error("Error fetching messages:", error);
+        });
+    }
+    
 
     const targetRef=useRef(null)
     const scrollToDiv = () => {
@@ -107,7 +167,7 @@ export default function Dashboard({user, setUser}){
     
 
     return <>
-      <Navbar username={username} setUsername={setUsername} user={user}/>
+      <Navbar username={username} setUsername={setUsername} user={user} setChatUser={setChatUser}/>
     <div className="w-full h-full flex pt-16">
         <span className="w-1/4 h-full flex flex-col">
         <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>   
@@ -164,7 +224,7 @@ export default function Dashboard({user, setUser}){
                 </span>
                 <span className="flex border w-full h-16 items-center justify-center backdrop-blur-lg">
                     <input type="text" className="bg-transparent border w-3/4 h-10" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
-                    <button onClick={()=>{sendmessege();}}>Send</button>
+                    <button onClick={()=>{sendmessege(); checkStranger();}}>Send</button>
                 </span>
             </span></>:
             <span className="w-full h-3/4 flex">
