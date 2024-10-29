@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function App(){
   const [isSignedIn, setIsSignedIn]=useState(false);
   const [user, setUser]=useState(null);
-  return <div className="w-screen h-screen bg-black text-white text-xl">
+  return <div className="w-screen h-screen bg-zinc-900 text-white text-xl">
     <BrowserRouter>
     <ToastContainer/>
     <Routes>

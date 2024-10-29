@@ -39,12 +39,15 @@ export default function Friends({ user, setChatUser, chatUser, setAllMesseges, s
     }, [chatUser, user, setAllMesseges]);
 
     return (
-        <div className="w-full h-2/3 flex flex-col border">
+        <div className="w-full h-2/3 flex flex-col overflow-y-auto">
             <p>Friends</p>
             {allFriends && Object.values(allFriends).map(friend => (<>
-                <button key={friend.uid} onClick={() =>{ setChatUser(friend);}} className="b">
+                <button key={friend.uid} onClick={() =>{ setChatUser(friend);}} className="b flex items-center">
                     <img src={friend.photoURL} className="w-12 h-12 rounded-full" alt="pfp"/>
-                    <p>{friend.displayName}</p>
+                    <span className="flex flex-col">
+                        <p>{friend.displayName}</p>
+                        <p>@{friend.username}</p>
+                    </span>
                 </button>
                 <div className="hbar"/>
                 </>

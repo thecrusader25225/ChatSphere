@@ -33,14 +33,17 @@ export default function SearchBox({chatUser, setChatUser, user}){
         })
     }
     console.log("search user data ", userdata)
-    return <div className="w-full h-1/3 border flex flex-col p-4">
+    return <div className="w-full h-1/3  flex flex-col p-4">
         <SearchInput setUsername={setUsername}/>
         <button onClick={searchUser} className="b flex justify-center">Search</button>
         <div className="hbar"/>
         {userdata &&
-            <button className="flex flex-col b" onClick={()=>chatRoom(userdata)}>
-                <p>{userdata.displayName}</p>
-                <p>{userdata.username}</p>
+            <button className="flex justify-center b" onClick={()=>chatRoom(userdata)}>
+                <img src={userdata.photoURL} className="w-12 h-12 rounded-full" alt="pfp"/>
+                <span className="flex flex-col">
+                    <p>{userdata.displayName}</p>
+                    <p>@{userdata.username}</p>
+                </span>
             </button>
         }
     </div>

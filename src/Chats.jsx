@@ -21,7 +21,8 @@ export default function Chats({user, setChatUser}){
                            return {
                                 displayName:info.displayName,
                                 uid: info.uid,
-                                photoURL: info.photoURL
+                                photoURL: info.photoURL,
+                                username: info.username? info.username:"nil"
                             }
                         }else {console.log("Chat user Doesnt exist"); return null;}
                     })
@@ -31,9 +32,16 @@ export default function Chats({user, setChatUser}){
         })
     },[user])
     console.log("allchats", allChats)
-    return <div className="w-full h-2/3 flex flex-col border">
+    return <div className="w-full h-2/3 flex flex-col overflow-y-auto">
+        <p>Chats</p>
         {
-           allChats && allChats.map(chat=><button className="w-full h-16 border" onClick={()=>setChatUser(chat)}>{chat.displayName}</button>)
+           allChats && allChats.map(chat=><><button className="b" onClick={()=>setChatUser(chat)}>
+            <img src={chat.photoURL} alt="pfp" className="w-12 h-12 rounded-full"/>
+            <p>{chat.displayName}</p>
+           </button>
+           <div className="hbar"/>
+           </>
+           )
         }
     </div>
 

@@ -5,22 +5,34 @@
 .sb{
     @apply  hover:bg-white hover:bg-opacity-10 cursor-pointer p-2 text-3xl rounded-full duration-200
 }
+.sbb{
+    @apply  hover:bg-white hover:bg-opacity-10 cursor-pointer p-2 text-2xl rounded-xl duration-200 
+}
 .b{
-    @apply hover:bg-white hover:bg-opacity-10 cursor-pointer px-8 py-1 text-lg duration-200 rounded-lg flex  items-center w-full
+    @apply hover:bg-white hover:bg-opacity-10 cursor-pointer px-8 py-2 text-lg duration-200 rounded-lg flex  items-center w-full
 }
 .hbar{
     @apply w-11/12 h-0.5 rounded-full bg-white self-center
 }
 .text{
-    @apply bg-gray-800 px-8 py-1 text-lg duration-200 rounded-full flex  items-center w-full
+    @apply bg-zinc-700 px-8 py-1 text-lg duration-200 rounded-full flex  items-center w-full
 }
 .menu{
     @apply absolute w-80 h-80  border p-8 flex flex-col justify-center items-center backdrop-blur-2xl rounded-3xl
 }
 
 
-
-
+.bg-zinc-825 {
+    background-color: #232326;
+  }
+  
+.bg-zinc-850 {
+    background-color: #202023; /* between zinc-800 and zinc-900 */
+  }
+  
+  .bg-zinc-875 {
+    background-color: #1b1b1d; /* slightly darker */
+  }  
 
 
 

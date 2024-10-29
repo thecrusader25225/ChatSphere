@@ -82,7 +82,7 @@ export default function Dashboard({user, setUser}){
                     uid: chatUser.uid,
                     displayName: chatUser.displayName,
                     photoURL: chatUser.photoURL,
-                    // Add any other fields you deem necessary
+                    username: chatUser.username? chatUser.username: "nil"
                 };
                 set(reference, {
                     ...userData
@@ -124,6 +124,7 @@ export default function Dashboard({user, setUser}){
                                     uid: user.uid,
                                     displayName: user.displayName,
                                     photoURL: user.photoURL,
+                                    username: user.username? user.username:"nil"
                                     // Add any other fields you deem necessary
                                 };
                                 
@@ -149,8 +150,7 @@ export default function Dashboard({user, setUser}){
             console.error("Error fetching messages:", error);
         });
     }
-    
-
+  
     const targetRef=useRef(null)
     const scrollToDiv = () => {
         if(targetRef.current)
@@ -169,20 +169,21 @@ export default function Dashboard({user, setUser}){
     
 
     return <>
-      <Navbar username={username} setUsername={setUsername} user={user} setChatUser={setChatUser} setIsChatorFriendOpen={setIsChatOrFriendOpen}/>
-      <div className="absolute top-0 left-0 w-full h-12 border flex justify-center items-center">Chat Sphere</div>
+    <Navbar username={username} setUsername={setUsername} user={user} setChatUser={setChatUser} setIsChatorFriendOpen={setIsChatOrFriendOpen} isChatOrFriendOpen={isChatOrFriendOpen}/>
+    <div className="absolute top-0 left-0 w-full h-12 bg-zinc-900 flex justify-center items-center">Chat Sphere</div>
+
+
     <div className="w-full h-full flex pl-16 pt-12">
-        <span className="w-1/4 h-full flex flex-col">
-        <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>   
-       {isChatOrFriendOpen.friend && <Friends user={user} chatUser={chatUser} setChatUser={setChatUser} setAllMesseges={setAllMesseges} allMesseges={allMesseges} messege={messege} setIsChatOpened={setIsChatOpened} allFriends={allFriends} setAllFriends={setAllFriends}/>}
-       {isChatOrFriendOpen.chat && <Chats user={user} setChatUser={setChatUser}/>}
+        <span className="w-1/3 h-full flex flex-col min-w-64 bg-zinc-850 rounded-tl-2xl rounded-bl-2xl">
+            <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>   
+            {isChatOrFriendOpen.friend && <Friends user={user} chatUser={chatUser} setChatUser={setChatUser} setAllMesseges={setAllMesseges} allMesseges={allMesseges} messege={messege} setIsChatOpened={setIsChatOpened} allFriends={allFriends} setAllFriends={setAllFriends}/>}
+            {isChatOrFriendOpen.chat && <Chats user={user} setChatUser={setChatUser}/>}
         </span>
         <span className="flex justify-between flex-col w-3/4 h-full">
-           
             {chatUser? 
             <>
-            <span className="w-full h-full flex flex-col justify-between items-center">
-                <span className="w-full h-16 border flex justify-between items-center">
+            <span className="w-full h-full flex flex-col justify-between items-center bg-zinc-850 rounded-tr-2xl">
+                <span className="w-full h-16  flex justify-between items-center">
                     <span className="flex items-center">
                         <img src={chatUser?.photoURL? chatUser.photoURL : ""} alt="sender image" className="w-12 h-12 rounded-full"/>
                         <p>{chatUser?chatUser.displayName:null}</p>
@@ -198,9 +199,7 @@ export default function Dashboard({user, setUser}){
                         </span>
                         }
                     </span>
-                
-                
-                <span className="w-full h-full border overflow-y-auto">
+                <span className="w-full h-full overflow-y-auto rounded-2xl bg-zinc-800">
                 {
                     allMesseges && Object.values(allMesseges).map(
                         msg=><div key={msg.messegeId} className=" flex flex-col justify-center py-2">
@@ -226,8 +225,8 @@ export default function Dashboard({user, setUser}){
                 }
                 <div ref={targetRef}/>
                 </span>
-                <span className="flex border w-full h-16 items-center justify-center backdrop-blur-lg">
-                    <input type="text" className="bg-transparent border w-3/4 h-10" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
+                <span className="flex w-full h-16 items-center justify-center backdrop-blur-lg">
+                    <input type="text" className="bg-transparent w-3/4 h-10" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
                     <button onClick={()=>{sendmessege(); checkStranger();}}>Send</button>
                 </span>
             </span></>:

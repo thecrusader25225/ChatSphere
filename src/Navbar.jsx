@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { TbFriends } from "react-icons/tb";
 import { CiSettings } from "react-icons/ci";
 import { MdMenu } from "react-icons/md";
-export default function Navbar({user, username, setUsername, setChatUser, setIsChatorFriendOpen}){
+export default function Navbar({user, username, setUsername, setChatUser, setIsChatorFriendOpen, isChatOrFriendOpen}){
     const [isProfileOpen, setIsProfileOpen]=useState(false)
     const [isEditingUsername, setIsEditingUsername]=useState(false)
     const [isNotifOpen, setIsNotifOpen]=useState(false)
@@ -37,20 +37,38 @@ export default function Navbar({user, username, setUsername, setChatUser, setIsC
         })
     }, [user])
 
-    return <><div className={`${isMenuOpen?"w-48":"w-16"} h-[calc(100%-48px)] top-12 left-0 fixed border flex flex-col justify-between `}>
+    return <><div className={`${isMenuOpen?"w-48":"w-16"} h-[calc(100%-48px)] top-12 left-0 fixed  flex flex-col justify-between p-2 backdrop-blur-md z-50 bg-zinc-900`}>
         <span className={`flex flex-col ${!isMenuOpen && "items-center"}`}>
-            <MdMenu className="" onClick={()=>setIsMenuOpen(prev=>!prev)}/>
-            <BiChat onClick={()=>setIsChatorFriendOpen({chat:true, friend:false})}/>
-            <TbFriends onClick={()=>setIsChatorFriendOpen({chat:false, friend:true})}/>
-            <BiNotification className="" onClick={()=>{setIsNotifOpen(prev=>!prev); setIsMenuOpen(false)}}/>
+            <p className="flex items-center sbb" onClick={()=>setIsMenuOpen(prev=>!prev)}>
+                <MdMenu />
+            </p>
+            <p className={`flex items-center sbb ${isChatOrFriendOpen.chat && "bg-white bg-opacity-10"}`}  onClick={()=>setIsChatorFriendOpen({chat:true, friend:false})}>
+                <BiChat/>
+                {isMenuOpen && <p className="text-base">Chats</p>}
+            </p>
+            <p className={`flex items-center sbb ${isChatOrFriendOpen.friend && "bg-white bg-opacity-10"}`} onClick={()=>setIsChatorFriendOpen({chat:false, friend:true})}>
+                <TbFriends />
+                {isMenuOpen && <p className="text-base">Friends</p>}
+            </p>
+            <p className="flex items-center sbb"  onClick={()=>{setIsNotifOpen(prev=>!prev); setIsMenuOpen(false)}}>
+                <BiNotification/>
+                {isMenuOpen && <p className="text-base">Notifications</p>}
+            </p>
         </span>
         <span className={`flex flex-col ${!isMenuOpen && "items-center"}`}>
-           <CiSettings/>
-            <img src={user?user.photoURL:"#"} className="rounded-full w-10 h-10 cursor-pointer" alt="pfp" onClick={()=>{setIsProfileOpen(!isProfileOpen);  setIsMenuOpen(false)}}/>
+           <p className="flex items-center sbb">
+               <CiSettings/>
+               {isMenuOpen && <p className="text-base">Settings</p>}
+           </p>
+            <p className={`flex items-center ${isMenuOpen && "sb"}`}  onClick={()=>{setIsProfileOpen(!isProfileOpen);  setIsMenuOpen(false)}}>
+                <img src={user?user.photoURL:"#"} className="rounded-full w-10 h-10 cursor-pointer" alt="pfp"/>
+                {isMenuOpen && <p className="text-base">Profile</p>}
+            </p>
         </span>
     </div>
+    {/* profile */}
     {   isProfileOpen &&
-        <div className="menu bottom-0 left-16">
+        <div className="menu bottom-0 left-16 z-50">
             <img className="w-20 h-20 rounded-full" src={user?user.photoURL:"#"} alt="pfp"/>
             <p className="text-2xl font-bold">{user? user.displayName:"null"}</p>
             <p className="text-sm">{user?user.email:"null"}</p>
@@ -68,14 +86,18 @@ export default function Navbar({user, username, setUsername, setChatUser, setIsC
             </fieldset>
             <button className="hover:underline py-2" onClick={signOutButton}>Sign out</button>
     </div>}
+    {/* notifications */}
     {
         isNotifOpen && 
-        <div className="menu top-12 left-16">
+        <div className="menu top-12 left-16 overflow-y-auto z-50">
             {
-                allNotifs && Object.values(allNotifs).map(notif=><button key={notif.uid} className="flex items-center text-base" onClick={()=>setChatUser(notif)}>
+                allNotifs && Object.values(allNotifs).map(notif=><><button key={notif.uid} className="b flex" onClick={()=>setChatUser(notif)}>
                     <img src={notif.photoURL} className="w-12 h-12 rounded-full" alt="pfp"/>
-                    <p>{notif.displayName} wants to messege you!</p>
-                </button>)
+                    <p className="text-sm">{notif.displayName} wants to messege you!</p>
+                </button>
+                <div className="hbar"/>
+                </>
+                )
             }
         </div>
     }
