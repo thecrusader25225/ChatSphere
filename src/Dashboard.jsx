@@ -10,6 +10,7 @@ import { FaUserFriends } from "react-icons/fa";
 import { CgAdd } from "react-icons/cg";
 import { BiPlus } from "react-icons/bi";
 import { TiTick } from "react-icons/ti";
+import Chats from "./Chats";
 export default function Dashboard({user, setUser}){
     const navigate=useNavigate()
     const [username, setUsername]=useState("")
@@ -19,6 +20,7 @@ export default function Dashboard({user, setUser}){
     const [isMessegeSent, setIsMessegeSent]=useState(false)
     const [isChatOpened, setIsChatOpened]=useState(false)
     const [allFriends, setAllFriends] = useState(null);
+    const [isChatOrFriendOpen, setIsChatOrFriendOpen]=useState({chat:true, friend:false})
 
     useEffect(()=>{
         const unsubscribe=onAuthStateChanged(auth, currentUser=>{
@@ -167,11 +169,13 @@ export default function Dashboard({user, setUser}){
     
 
     return <>
-      <Navbar username={username} setUsername={setUsername} user={user} setChatUser={setChatUser}/>
-    <div className="w-full h-full flex pt-16">
+      <Navbar username={username} setUsername={setUsername} user={user} setChatUser={setChatUser} setIsChatorFriendOpen={setIsChatOrFriendOpen}/>
+      <div className="absolute top-0 left-0 w-full h-12 border flex justify-center items-center">Chat Sphere</div>
+    <div className="w-full h-full flex pl-16 pt-12">
         <span className="w-1/4 h-full flex flex-col">
         <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>   
-        <Friends user={user} chatUser={chatUser} setChatUser={setChatUser} setAllMesseges={setAllMesseges} allMesseges={allMesseges} messege={messege} setIsChatOpened={setIsChatOpened} allFriends={allFriends} setAllFriends={setAllFriends}/>
+       {isChatOrFriendOpen.friend && <Friends user={user} chatUser={chatUser} setChatUser={setChatUser} setAllMesseges={setAllMesseges} allMesseges={allMesseges} messege={messege} setIsChatOpened={setIsChatOpened} allFriends={allFriends} setAllFriends={setAllFriends}/>}
+       {isChatOrFriendOpen.chat && <Chats user={user} setChatUser={setChatUser}/>}
         </span>
         <span className="flex justify-between flex-col w-3/4 h-full">
            

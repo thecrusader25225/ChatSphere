@@ -7,11 +7,15 @@ import { TiTick } from "react-icons/ti";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase-config";
 import { useNavigate } from "react-router-dom";
-export default function Navbar({user, username, setUsername, setChatUser}){
+import { TbFriends } from "react-icons/tb";
+import { CiSettings } from "react-icons/ci";
+import { MdMenu } from "react-icons/md";
+export default function Navbar({user, username, setUsername, setChatUser, setIsChatorFriendOpen}){
     const [isProfileOpen, setIsProfileOpen]=useState(false)
     const [isEditingUsername, setIsEditingUsername]=useState(false)
     const [isNotifOpen, setIsNotifOpen]=useState(false)
     const [allNotifs, setAllNotifs]=useState([])
+    const [isMenuOpen, setIsMenuOpen]=useState(false)
     const navigate=useNavigate()
     
     function signOutButton(){
@@ -33,18 +37,20 @@ export default function Navbar({user, username, setUsername, setChatUser}){
         })
     }, [user])
 
-    return <><div className="w-full h-16 top-0 left-0 fixed border flex justify-between items-center">
-        <span className="flex items-center">
-            <BiChat />
-            <p>Chat Sphere</p>
+    return <><div className={`${isMenuOpen?"w-48":"w-16"} h-[calc(100%-48px)] top-12 left-0 fixed border flex flex-col justify-between `}>
+        <span className={`flex flex-col ${!isMenuOpen && "items-center"}`}>
+            <MdMenu className="" onClick={()=>setIsMenuOpen(prev=>!prev)}/>
+            <BiChat onClick={()=>setIsChatorFriendOpen({chat:true, friend:false})}/>
+            <TbFriends onClick={()=>setIsChatorFriendOpen({chat:false, friend:true})}/>
+            <BiNotification className="" onClick={()=>{setIsNotifOpen(prev=>!prev); setIsMenuOpen(false)}}/>
         </span>
-        <span className="flex items-center">
-            <BiNotification className="" onClick={()=>setIsNotifOpen(prev=>!prev)}/>
-            <img src={user?user.photoURL:"#"} className="rounded-full w-10 h-10 cursor-pointer" alt="pfp" onClick={()=>setIsProfileOpen(!isProfileOpen)}/>
+        <span className={`flex flex-col ${!isMenuOpen && "items-center"}`}>
+           <CiSettings/>
+            <img src={user?user.photoURL:"#"} className="rounded-full w-10 h-10 cursor-pointer" alt="pfp" onClick={()=>{setIsProfileOpen(!isProfileOpen);  setIsMenuOpen(false)}}/>
         </span>
     </div>
     {   isProfileOpen &&
-        <div className="menu">
+        <div className="menu bottom-0 left-16">
             <img className="w-20 h-20 rounded-full" src={user?user.photoURL:"#"} alt="pfp"/>
             <p className="text-2xl font-bold">{user? user.displayName:"null"}</p>
             <p className="text-sm">{user?user.email:"null"}</p>
@@ -64,7 +70,7 @@ export default function Navbar({user, username, setUsername, setChatUser}){
     </div>}
     {
         isNotifOpen && 
-        <div className="menu">
+        <div className="menu top-12 left-16">
             {
                 allNotifs && Object.values(allNotifs).map(notif=><button key={notif.uid} className="flex items-center text-base" onClick={()=>setChatUser(notif)}>
                     <img src={notif.photoURL} className="w-12 h-12 rounded-full" alt="pfp"/>
