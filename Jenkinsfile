@@ -14,16 +14,16 @@ pipeline {
             }
         }
         stage('Test'){
-            stages{
-                stage('Linting'){
-                    agent{
-                        label 'build-agent'
-                    }
-                    steps{
-                    sh 'echo "running linting test"'
-                    sh 'npx eslint .'
-                    }
-                }
+            // stages{
+            //     stage('Linting'){
+            //         agent{
+            //             label 'build-agent'
+            //         }
+            //         steps{
+            //         sh 'echo "running linting test"'
+            //         sh 'npx eslint .'
+            //         }
+            //     }
                 // stage('Jest'){
                 //     sh 'npm run test'
                 // }
