@@ -9,6 +9,7 @@ pipeline {
                 label 'build-agent' // Using a specific agent for the build stage
             }
             steps {
+                sh 'echo "installing dependencies"'
                 sh 'npm install' // Install dependencies
             }
         }
@@ -19,6 +20,7 @@ pipeline {
                         label 'build-agent'
                     }
                     steps{
+                    sh 'echo "running linting test"'
                     sh 'npm run lint'
                     }
                 }
@@ -35,7 +37,7 @@ pipeline {
                 label 'docker-agent' // Using a specific agent for the Docker build stage
             }
             steps {
-                sh 'echo "build started"' // Log message indicating build start
+                sh 'echo "docker build started"' // Log message indicating build start
                 sh 'docker build -t shane25225/chat-sphere:latest .' // Build the Docker image
             }
         }
