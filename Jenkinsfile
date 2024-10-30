@@ -21,7 +21,7 @@ pipeline {
                     }
                     steps{
                     sh 'echo "running linting test"'
-                    sh 'npm run lint'
+                    sh 'npx eslint .'
                     }
                 }
                 // stage('Jest'){
