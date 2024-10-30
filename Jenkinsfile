@@ -12,6 +12,24 @@ pipeline {
                 sh 'npm install' // Install dependencies
             }
         }
+        stage('Test'){
+            stages{
+                stage('Linting'){
+                    agent{
+                        label 'build-agent'
+                    }
+                    steps{
+                    sh 'npm run lint'
+                    }
+                }
+                // stage('Jest'){
+                //     sh 'npm run test'
+                // }
+                // stage('Integration'){
+
+                // }
+            }
+        }
         stage('Docker Build') {
             agent {
                 label 'docker-agent' // Using a specific agent for the Docker build stage
