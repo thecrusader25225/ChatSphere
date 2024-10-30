@@ -8,10 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test":"jest"
+    "test": "jest"
   },
   "dependencies": {
-    "browser-router": "^0.2.0",
     "firebase": "^11.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
