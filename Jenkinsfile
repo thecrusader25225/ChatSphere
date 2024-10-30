@@ -13,7 +13,7 @@ pipeline {
                 sh 'npm install' // Install dependencies
             }
         }
-        stage('Test'){
+       // stage('Test'){
             // stages{
             //     stage('Linting'){
             //         agent{
@@ -30,8 +30,8 @@ pipeline {
                 // stage('Integration'){
 
                 // }
-            }
-        }
+            //}
+       // }
         stage('Docker Build') {
             agent {
                 label 'docker-agent' // Using a specific agent for the Docker build stage
