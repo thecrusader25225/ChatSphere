@@ -11,6 +11,7 @@ import { CgAdd } from "react-icons/cg";
 import { BiPlus } from "react-icons/bi";
 import { TiTick } from "react-icons/ti";
 import Chats from "./Chats";
+import CanvasComponent from "./CanvasComponent";
 export default function Dashboard({user, setUser}){
     const navigate=useNavigate()
     const [username, setUsername]=useState("")
@@ -223,6 +224,7 @@ export default function Dashboard({user, setUser}){
                         </div>
                     )   
                 }
+                <CanvasComponent/>
                 <div ref={targetRef}/>
                 </span>
                 <span className="flex w-full h-16 items-center justify-center backdrop-blur-lg">
