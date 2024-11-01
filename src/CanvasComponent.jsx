@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BiDownArrow, BiEraser } from "react-icons/bi";
 import { PiPencil } from "react-icons/pi";
-import { ref, push, onValue } from "firebase/database";
+import { ref, push, onValue, set, update, get } from "firebase/database";
 import { db } from '../firebase-config';
 
 export default function CanvasComponent({ chatUser, user }) {
@@ -31,6 +31,7 @@ export default function CanvasComponent({ chatUser, user }) {
         onValue(linesRef, snapshot => {
             if (snapshot.exists()) {
                 const data = Object.values(snapshot.val());
+                // console.log(data)
                 // Clear the canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 // Refilling the background
@@ -38,13 +39,15 @@ export default function CanvasComponent({ chatUser, user }) {
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.beginPath();
-                data.forEach(line => {
-                    ctx.moveTo(line[0], line[1]);
-                    ctx.lineTo(line[2], line[3]);
+
+                for(let i=0;i<data.length;i+=4)
+                {
+                    ctx.moveTo(data[i], data[i+1]);
+                    ctx.lineTo(data[i+2], data[i+3]);
                     ctx.strokeStyle = tools.pencil ? color : 'white';
                     ctx.lineWidth = 5;
                     ctx.stroke();
-                });
+                }
                 ctx.closePath();
             }
         });
@@ -78,11 +81,22 @@ export default function CanvasComponent({ chatUser, user }) {
     
         // Update the tempLinesArr with the new line as an array
         const newLine = [ctx.currentX, ctx.currentY, offsetX, offsetY];
-        setTempLinesArr(prev => [...prev, newLine]); // Append the new line array to tempLinesArr
+        setTempLinesArr(prev => [...prev, ...newLine]); // Append the new line array to tempLinesArr
     
         // Set a timeout to push to Firebase
         timerRef.current = setTimeout(() => {
-            tempLinesArr.forEach(tempLine=>push(ref(db, `rooms/${roomName}/lines`), tempLine)) // Push all lines
+            // tempLinesArr.forEach(tempLine=>push(ref(db, `rooms/${roomName}/lines`), tempLine)) // Push all lines
+            
+            // update(ref(db, `rooms/${roomName}/lines`), {...tempLinesArr})
+
+            // use get and set
+
+            get(ref(db, `rooms/${roomName}/lines`)).then(snapshot=>{
+                if(snapshot.exists()){
+                    const data=Object.values(snapshot.val())
+                    set(ref(db, `rooms/${roomName}/lines`),[...data, ...tempLinesArr])
+                }
+            })
             setTempLinesArr([]); // Clear the temporary array
             console.log("lines pushed");
         }, 1000);
