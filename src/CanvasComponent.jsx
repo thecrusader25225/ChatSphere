@@ -10,7 +10,10 @@ export default function CanvasComponent({ chatUser, user }) {
     const [isDrawing, setIsDrawing] = useState(false);
     const [tools, setTools] = useState({ pencil: true, eraser: false });
     const [color, setColor] = useState('black');
+    // const tempLinesArr=useRef([])
+    const [tempLinesArr, setTempLinesArr]=useState([])
     const roomName = chatUser.uid > user.uid ? `${chatUser.uid}_${user.uid}` : `${user.uid}_${chatUser.uid}`;
+    const timerRef=useRef(null)
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -61,34 +64,46 @@ export default function CanvasComponent({ chatUser, user }) {
 
     function draw(e) {
         if (!ctx || !isDrawing) return;
-
+    
         const offsetX = e.nativeEvent.offsetX;
         const offsetY = e.nativeEvent.offsetY;
-
+    
         ctx.lineTo(offsetX, offsetY);
         ctx.strokeStyle = tools.pencil ? color : 'white';
         ctx.lineWidth = 5;
         ctx.stroke();
-
-        // Push to Firebase when drawing
-        push(ref(db, `rooms/${roomName}/lines`), [ctx.currentX, ctx.currentY, offsetX, offsetY]);
-
+    
+        // Clear any existing timeout
+        if (timerRef.current) clearTimeout(timerRef.current);
+    
+        // Update the tempLinesArr with the new line as an array
+        const newLine = [ctx.currentX, ctx.currentY, offsetX, offsetY];
+        setTempLinesArr(prev => [...prev, newLine]); // Append the new line array to tempLinesArr
+    
+        // Set a timeout to push to Firebase
+        timerRef.current = setTimeout(() => {
+            tempLinesArr.forEach(tempLine=>push(ref(db, `rooms/${roomName}/lines`), tempLine)) // Push all lines
+            setTempLinesArr([]); // Clear the temporary array
+            console.log("lines pushed");
+        }, 1000);
+    
         // Update current coordinates for the next line segment
         ctx.currentX = offsetX;
         ctx.currentY = offsetY;
     }
+    
 
     function stopDrawing() {
         setIsDrawing(false);
         ctx.closePath(); // Ensure the path is closed after drawing
     }
-    console.log("tools", tools)
+    // console.log("tools", tools)
     return (
         <div className="relative w-full h-full text-black">
             <canvas
                 ref={canvasRef}
                 onMouseDown={startDrawing}
-                onMouseMove={draw}
+                onMouseMove={isDrawing? draw:null}
                 onMouseUp={stopDrawing}
             />
             <BiDownArrow className="absolute top-0" />
