@@ -224,7 +224,7 @@ export default function Dashboard({user, setUser}){
                         </div>
                     )   
                 }
-                <CanvasComponent/>
+                <CanvasComponent chatUser={chatUser} user={user}/>
                 <div ref={targetRef}/>
                 </span>
                 <span className="flex w-full h-16 items-center justify-center backdrop-blur-lg">
