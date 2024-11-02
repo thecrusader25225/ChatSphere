@@ -3,6 +3,7 @@ import { BiDownArrow, BiEraser } from "react-icons/bi";
 import { PiPencil } from "react-icons/pi";
 import { ref, push, onValue, set, update, get } from "firebase/database";
 import { db } from '../firebase-config';
+import Loading from "./Loading";
 
 export default function CanvasComponent({ chatUser, user }) {
     const canvasRef = useRef(null);
@@ -14,12 +15,13 @@ export default function CanvasComponent({ chatUser, user }) {
     const [tempLinesArr, setTempLinesArr]=useState([])
     const roomName = chatUser.uid > user.uid ? `${chatUser.uid}_${user.uid}` : `${user.uid}_${chatUser.uid}`;
     const timerRef=useRef(null)
+    const [isLoading, setIsLoading]=useState(false)
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         setCtx(ctx);
-
+        setIsLoading(true)
         canvas.width = canvas.parentElement.clientWidth;
         canvas.height = canvas.parentElement.clientHeight;
 
@@ -30,6 +32,7 @@ export default function CanvasComponent({ chatUser, user }) {
         const linesRef = ref(db, `rooms/${roomName}/lines`);
         onValue(linesRef, snapshot => {
             if (snapshot.exists()) {
+                
                 const data = Object.values(snapshot.val());
                 // console.log(data)
                 // Clear the canvas
@@ -50,8 +53,10 @@ export default function CanvasComponent({ chatUser, user }) {
                 }
                 ctx.closePath();
             }
+            console.log("DATA FETCHED")
+            setIsLoading(false)
         });
-        console.log("DATA FETCHED")
+      
     }, []);
 
     function startDrawing(e) {
@@ -112,6 +117,7 @@ export default function CanvasComponent({ chatUser, user }) {
         ctx.closePath(); // Ensure the path is closed after drawing
     }
     // console.log("tools", tools)
+    console.log("is loading", isLoading)
     return (
         <div className="relative w-full h-full text-black">
             <canvas
@@ -125,6 +131,7 @@ export default function CanvasComponent({ chatUser, user }) {
                 <PiPencil onClick={() => setTools({ pencil: true, eraser: false })} />
                 <BiEraser onClick={() => setTools({ pencil: false, eraser: true })} />
             </span>
+            {isLoading && <Loading/>}
         </div>
     );
 }
