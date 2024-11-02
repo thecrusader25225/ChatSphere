@@ -44,6 +44,9 @@ export default function CanvasComponent({ chatUser, user }) {
                 ctx.fillStyle = 'white';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+                 //smooth line properties
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
                 for(let i=0;i<data.length;i+=6)
                 {
                     ctx.beginPath();
@@ -107,7 +110,7 @@ export default function CanvasComponent({ chatUser, user }) {
             })
             setTempLinesArr([]); // Clear the temporary array
             console.log("lines pushed");
-        }, 1000);
+        }, 300);
     
         // Update current coordinates for the next line segment
         ctx.currentX = offsetX;
