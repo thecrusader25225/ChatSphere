@@ -25,7 +25,7 @@ export default function CanvasComponent({ chatUser, user }) {
         canvas.width = canvas.parentElement.clientWidth;
         canvas.height = canvas.parentElement.clientHeight;
 
-        ctx.fillStyle = 'grey';
+        ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Fetching lines from Firebase
@@ -38,20 +38,22 @@ export default function CanvasComponent({ chatUser, user }) {
                 // Clear the canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 // Refilling the background
-                ctx.fillStyle = 'grey';
+                ctx.fillStyle = 'white';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                ctx.beginPath();
+                
 
-                for(let i=0;i<data.length;i+=4)
+                for(let i=0;i<data.length;i+=5)
                 {
+                    ctx.beginPath();
                     ctx.moveTo(data[i], data[i+1]);
                     ctx.lineTo(data[i+2], data[i+3]);
-                    ctx.strokeStyle = tools.pencil ? color : 'white';
+                    ctx.strokeStyle =data[i+4];
                     ctx.lineWidth = 5;
                     ctx.stroke();
+                    ctx.closePath();
                 }
-                ctx.closePath();
+               
             }
             console.log("DATA FETCHED")
             setIsLoading(false)
@@ -77,7 +79,7 @@ export default function CanvasComponent({ chatUser, user }) {
         const offsetY = e.nativeEvent.offsetY;
     
         ctx.lineTo(offsetX, offsetY);
-        ctx.strokeStyle = tools.pencil ? color : 'white';
+        ctx.strokeStyle = color;
         ctx.lineWidth = 5;
         ctx.stroke();
     
@@ -85,7 +87,7 @@ export default function CanvasComponent({ chatUser, user }) {
         if (timerRef.current) clearTimeout(timerRef.current);
     
         // Update the tempLinesArr with the new line as an array
-        const newLine = [ctx.currentX, ctx.currentY, offsetX, offsetY];
+        const newLine = [ctx.currentX, ctx.currentY, offsetX, offsetY, color];
         setTempLinesArr(prev => [...prev, ...newLine]); // Append the new line array to tempLinesArr
     
         // Set a timeout to push to Firebase
@@ -116,6 +118,13 @@ export default function CanvasComponent({ chatUser, user }) {
         setIsDrawing(false);
         ctx.closePath(); // Ensure the path is closed after drawing
     }
+    
+    useEffect(()=>{
+        if(tools.eraser)
+            setColor('white')
+        else setColor('black')
+        console.log(tools)
+    },[tools])
     // console.log("tools", tools)
     console.log("is loading", isLoading)
     return (
