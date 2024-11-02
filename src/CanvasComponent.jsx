@@ -10,7 +10,10 @@ export default function CanvasComponent({ chatUser, user }) {
     const [ctx, setCtx] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [tools, setTools] = useState({ pencil: true, eraser: false });
-    const [color, setColor] = useState('black');
+    const [thicknesses, setThicknesses]=useState({pencil:[3,5,7,9,11], eraser:[3,5,7,9,11,13]})
+    // const [color, setColor] = useState('black');
+    const [pencilProperties, setPencilProperties]=useState({color:"black", thickness:5})
+    const [eraserProperties, setEraserProperties]=useState({thickness: 5})
     // const tempLinesArr=useRef([])
     const [tempLinesArr, setTempLinesArr]=useState([])
     const roomName = chatUser.uid > user.uid ? `${chatUser.uid}_${user.uid}` : `${user.uid}_${chatUser.uid}`;
@@ -41,15 +44,13 @@ export default function CanvasComponent({ chatUser, user }) {
                 ctx.fillStyle = 'white';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                
-
-                for(let i=0;i<data.length;i+=5)
+                for(let i=0;i<data.length;i+=6)
                 {
                     ctx.beginPath();
                     ctx.moveTo(data[i], data[i+1]);
                     ctx.lineTo(data[i+2], data[i+3]);
                     ctx.strokeStyle =data[i+4];
-                    ctx.lineWidth = 5;
+                    ctx.lineWidth = data[i+5];
                     ctx.stroke();
                     ctx.closePath();
                 }
@@ -79,15 +80,15 @@ export default function CanvasComponent({ chatUser, user }) {
         const offsetY = e.nativeEvent.offsetY;
     
         ctx.lineTo(offsetX, offsetY);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 5;
+        ctx.strokeStyle = pencilProperties.color;
+        ctx.lineWidth = pencilProperties.thickness;
         ctx.stroke();
     
         // Clear any existing timeout
         if (timerRef.current) clearTimeout(timerRef.current);
     
         // Update the tempLinesArr with the new line as an array
-        const newLine = [ctx.currentX, ctx.currentY, offsetX, offsetY, color];
+        const newLine = [ctx.currentX, ctx.currentY, offsetX, offsetY, pencilProperties.color, pencilProperties.thickness];
         setTempLinesArr(prev => [...prev, ...newLine]); // Append the new line array to tempLinesArr
     
         // Set a timeout to push to Firebase
@@ -121,8 +122,8 @@ export default function CanvasComponent({ chatUser, user }) {
     
     useEffect(()=>{
         if(tools.eraser)
-            setColor('white')
-        else setColor('black')
+           setPencilProperties(prev=>({...prev, color:'white'}))
+        else setPencilProperties(prev=>({...prev, color:'black'}))
         console.log(tools)
     },[tools])
     // console.log("tools", tools)
@@ -138,7 +139,13 @@ export default function CanvasComponent({ chatUser, user }) {
             <BiDownArrow className="absolute top-0" />
             <span className="absolute bottom-0 z-50 flex justify-center w-full border">
                 <PiPencil onClick={() => setTools({ pencil: true, eraser: false })} />
+                {
+                    thicknesses.pencil.map(thickness=><button className="border " key={thickness} onClick={()=>{setPencilProperties(prev=>({...prev, thickness:thickness})); setTools({pencil:true, eraser:false})}}>{thickness}</button>)
+                }
                 <BiEraser onClick={() => setTools({ pencil: false, eraser: true })} />
+                {
+                    thicknesses.eraser.map(thickness=><button className="border " key={thickness} onClick={()=>{setPencilProperties(prev=>({...prev, thickness:thickness})); setTools({pencil:false, eraser:true})}}>{thickness}</button>)
+                }
             </span>
             {isLoading && <Loading/>}
         </div>
