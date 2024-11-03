@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { BiDownArrow, BiEraser } from "react-icons/bi";
+import { BiDownArrow, BiEraser, BiTrash } from "react-icons/bi";
 import { PiPencil } from "react-icons/pi";
-import { ref, push, onValue, set, update, get } from "firebase/database";
+import { ref, push, onValue, set, update, get, remove } from "firebase/database";
 import { db } from '../firebase-config';
 import Loading from "./Loading";
 
@@ -10,15 +10,54 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
     const [ctx, setCtx] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [tools, setTools] = useState({ pencil: true, eraser: false });
-    const [thicknesses, setThicknesses]=useState([3,5,9, 15, 19, 23])
+    const [thicknesses, setThicknesses]=useState([3,5,9, 15, 19, 23, 33, 45])
     // const [color, setColor] = useState('black');
-    const [pencilProperties, setPencilProperties]=useState({color:"black", thickness:5})
+    const [pencilProperties, setPencilProperties]=useState({color:"#000000", thickness:5})
     const [eraserProperties, setEraserProperties]=useState({thickness: 5})
     // const tempLinesArr=useRef([])
     const [tempLinesArr, setTempLinesArr]=useState([])
     const roomName = chatUser.uid > user.uid ? `${chatUser.uid}_${user.uid}` : `${user.uid}_${chatUser.uid}`;
     const timerRef=useRef(null)
     const [isLoading, setIsLoading]=useState(false)
+    const colorPalette = [
+        "#000000", //black
+        "#FF5733", // Vibrant Red
+        "#FF8D1A", // Orange
+        "#FFD700", // Gold
+        "#28B463", // Green
+        "#1ABC9C", // Turquoise
+        "#3498DB", // Light Blue
+        "#5D6D7E", // Slate Gray
+        "#8E44AD", // Purple
+        "#9B59B6", // Light Purple
+        "#C0392B", // Dark Red
+        "#D35400", // Dark Orange
+        "#E74C3C", // Coral
+        "#F39C12", // Amber
+        "#F1C40F", // Yellow
+        "#27AE60", // Forest Green
+        "#2ECC71", // Light Green
+        "#2980B9", // Blue
+        "#34495E", // Dark Slate
+        "#7F8C8D", // Gray
+        "#BDC3C7", // Light Gray
+        "#E67E22", // Pumpkin Orange
+        "#A569BD", // Lavender
+        "#E91E63", // Pink
+        "#673AB7", // Deep Purple
+        "#3F51B5", // Indigo
+        "#00BCD4", // Cyan
+        "#009688", // Teal
+        "#4CAF50", // Medium Green
+        "#8BC34A", // Lime Green
+        "#CDDC39", // Lime
+        "#FFEB3B", // Light Yellow
+        "#FFC107", // Amber
+        "#FF5722", // Deep Orange
+        "#795548", // Brown
+        "#607D8B"  // Blue Gray
+    ];
+    
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -103,10 +142,8 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
             // use get and set
 
             get(ref(db, `rooms/${roomName}/lines`)).then(snapshot=>{
-                if(snapshot.exists()){
-                    const data=Object.values(snapshot.val())
+                    const data=Object.values(snapshot.val() || [])
                     set(ref(db, `rooms/${roomName}/lines`),[...data, ...tempLinesArr])
-                }
             })
             setTempLinesArr([]); // Clear the temporary array
             console.log("lines pushed");
@@ -140,23 +177,36 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
                 onMouseUp={stopDrawing}
             />
             <BiDownArrow className="absolute top-0 canvasb " onClick={()=>setIsCanvasOpened(false)}/>
-            <span className="absolute bottom-0 z-50  w-full h-20 flex flex-col rounded-xl bg-black bg-opacity-70 p-2">
-                <span className="flex justify-center ">
-                    <PiPencil onClick={() => setTools({ pencil: true, eraser: false })} className={`canvasb ${tools.pencil && "border border-white"}`}/>
-                    <BiEraser onClick={() => setTools({ pencil: false, eraser: true })} className={`canvasb ${tools.eraser && "border border-white"}`}/>
-                </span>
-                <span className="flex justify-center items-center">
-                    {
-                        thicknesses.map(thickness=><button 
-                            className={` rounded-full p-1 mx-1 ${thickness===pencilProperties.thickness && "border border-white"} bg-black hover:bg-opacity-30 bg-opacity-10`} 
+            <span className="absolute bottom-0 z-50  w-full h-28 flex justify-around items-center rounded-xl bg-black bg-opacity-70 p-2">
+                <div className="flex flex-col items-center justify-center w-1/2 h-full">
+                    <span className="flex justify-center ">
+                        <PiPencil onClick={() => setTools({ pencil: true, eraser: false })} className={`canvasb ${tools.pencil && "border border-white"}`}/>
+                        <BiEraser onClick={() => setTools({ pencil: false, eraser: true })} className={`canvasb ${tools.eraser && "border border-white"}`}/>
+                        <BiTrash className="canvasb" onClick={()=>{remove(ref(db, `rooms/${roomName}/lines`)); }}/>
+                    </span>
+                    <span className="flex justify-center items-center">
+                        {
+                            thicknesses.map(thickness=><button
+                                className={` rounded-full p-1 mx-1 ${thickness===pencilProperties.thickness && "border border-white"} bg-black hover:bg-opacity-30 bg-opacity-10`}
+                                key={thickness}
+                                onClick={()=>{setPencilProperties(prev=>({...prev, thickness:thickness})); setEraserProperties(prev=>({...prev, thickness:thickness}))}}>
+                                    <div style={{width:`${thickness}px`, height:`${thickness}px`, backgroundColor:pencilProperties.color}} className="rounded-full"/>
+                                </button>
+                            )
+                        }
+                    </span>
+                </div>
+                <div className="w-12 h-12" style={{backgroundColor:pencilProperties.color}}/>
+                <div className="flex  w-1/2 max-w-48 h-full overflow-y-auto flex-wrap">
+                        {
+                            colorPalette.map((color,i)=><><button 
+                            style={{backgroundColor:color}} 
+                            onClick={()=>{setPencilProperties(prev=>({...prev, color:color})); }} 
+                            className={`w-5 h-5 rounded-full p-2 m-0.5 ${color===pencilProperties.color && 'border'}`} />
                             
-                            key={thickness} 
-                            onClick={()=>{setPencilProperties(prev=>({...prev, thickness:thickness})); setEraserProperties(prev=>({...prev, thickness:thickness}))}}>
-                                <div style={{width:`${thickness}px`, height:`${thickness}px`}} className="bg-black rounded-full"/>
-                            </button>
-                        )
-                    }
-                </span>
+                            </>)
+                        }
+                </div>
             </span>
             {isLoading && <Loading/>}
         </div>
