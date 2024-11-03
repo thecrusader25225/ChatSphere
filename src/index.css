@@ -20,6 +20,16 @@
 .menu{
     @apply absolute w-80 h-80  border p-8 flex flex-col justify-center items-center backdrop-blur-2xl rounded-3xl
 }
+.inputb{
+    @apply text-4xl p-2 hover:bg-white hover:bg-opacity-10 rounded-full duration-200 cursor-pointer
+}
+.canvasb{
+    @apply text-4xl p-2 bg-black bg-opacity-30 text-white hover:bg-opacity-65 rounded-full duration-200 cursor-pointer
+}
+.canvasnumb{
+    @apply text-xl px-1 bg-black text-white bg-opacity-50 hover:bg-opacity-65 rounded-lg duration-200 cursor-pointer
+}
+
 
 
 .bg-zinc-825 {

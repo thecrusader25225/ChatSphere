@@ -5,12 +5,12 @@ import { ref, push, onValue, set, update, get } from "firebase/database";
 import { db } from '../firebase-config';
 import Loading from "./Loading";
 
-export default function CanvasComponent({ chatUser, user }) {
+export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
     const canvasRef = useRef(null);
     const [ctx, setCtx] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [tools, setTools] = useState({ pencil: true, eraser: false });
-    const [thicknesses, setThicknesses]=useState({pencil:[3,5,7,9,11], eraser:[3,5,7,9,11,13]})
+    const [thicknesses, setThicknesses]=useState([3,5,9, 15, 19, 23])
     // const [color, setColor] = useState('black');
     const [pencilProperties, setPencilProperties]=useState({color:"black", thickness:5})
     const [eraserProperties, setEraserProperties]=useState({thickness: 5})
@@ -110,7 +110,7 @@ export default function CanvasComponent({ chatUser, user }) {
             })
             setTempLinesArr([]); // Clear the temporary array
             console.log("lines pushed");
-        }, 300);
+        }, 2000);
     
         // Update current coordinates for the next line segment
         ctx.currentX = offsetX;
@@ -139,16 +139,24 @@ export default function CanvasComponent({ chatUser, user }) {
                 onMouseMove={isDrawing? draw:null}
                 onMouseUp={stopDrawing}
             />
-            <BiDownArrow className="absolute top-0" />
-            <span className="absolute bottom-0 z-50 flex justify-center w-full border">
-                <PiPencil onClick={() => setTools({ pencil: true, eraser: false })} />
-                {
-                    thicknesses.pencil.map(thickness=><button className="border " key={thickness} onClick={()=>{setPencilProperties(prev=>({...prev, thickness:thickness})); setTools({pencil:true, eraser:false})}}>{thickness}</button>)
-                }
-                <BiEraser onClick={() => setTools({ pencil: false, eraser: true })} />
-                {
-                    thicknesses.eraser.map(thickness=><button className="border " key={thickness} onClick={()=>{setPencilProperties(prev=>({...prev, thickness:thickness})); setTools({pencil:false, eraser:true})}}>{thickness}</button>)
-                }
+            <BiDownArrow className="absolute top-0 canvasb " onClick={()=>setIsCanvasOpened(false)}/>
+            <span className="absolute bottom-0 z-50  w-full h-20 flex flex-col rounded-xl bg-black bg-opacity-70 p-2">
+                <span className="flex justify-center ">
+                    <PiPencil onClick={() => setTools({ pencil: true, eraser: false })} className={`canvasb ${tools.pencil && "border border-white"}`}/>
+                    <BiEraser onClick={() => setTools({ pencil: false, eraser: true })} className={`canvasb ${tools.eraser && "border border-white"}`}/>
+                </span>
+                <span className="flex justify-center items-center">
+                    {
+                        thicknesses.map(thickness=><button 
+                            className={` rounded-full p-1 mx-1 ${thickness===pencilProperties.thickness && "border border-white"} bg-black hover:bg-opacity-30 bg-opacity-10`} 
+                            
+                            key={thickness} 
+                            onClick={()=>{setPencilProperties(prev=>({...prev, thickness:thickness})); setEraserProperties(prev=>({...prev, thickness:thickness}))}}>
+                                <div style={{width:`${thickness}px`, height:`${thickness}px`}} className="bg-black rounded-full"/>
+                            </button>
+                        )
+                    }
+                </span>
             </span>
             {isLoading && <Loading/>}
         </div>

@@ -8,10 +8,11 @@ import Friends from "./Friends";
 import Navbar from "./Navbar";
 import { FaUserFriends } from "react-icons/fa";
 import { CgAdd } from "react-icons/cg";
-import { BiPlus } from "react-icons/bi";
+import { BiPaint, BiPlus, BiUpArrow } from "react-icons/bi";
 import { TiTick } from "react-icons/ti";
 import Chats from "./Chats";
 import CanvasComponent from "./CanvasComponent";
+import { BsPlus } from "react-icons/bs";
 export default function Dashboard({user, setUser}){
     const navigate=useNavigate()
     const [username, setUsername]=useState("")
@@ -22,6 +23,7 @@ export default function Dashboard({user, setUser}){
     const [isChatOpened, setIsChatOpened]=useState(false)
     const [allFriends, setAllFriends] = useState(null);
     const [isChatOrFriendOpen, setIsChatOrFriendOpen]=useState({chat:true, friend:false})
+    const [isCanvasOpened, setIsCanvasOpened]=useState(false)
 
     useEffect(()=>{
         const unsubscribe=onAuthStateChanged(auth, currentUser=>{
@@ -74,6 +76,9 @@ export default function Dashboard({user, setUser}){
         })
         console.log("all msgs",allMesseges)
     },[messege, chatUser])
+    useEffect(()=>{
+        setIsCanvasOpened(false)
+    },[chatUser])
 
     function addFriend(){
         const reference=ref(db, `users/${user.uid}/friends/${chatUser.uid}`)
@@ -183,7 +188,7 @@ export default function Dashboard({user, setUser}){
         <span className="flex justify-between flex-col w-3/4 h-full">
             {chatUser? 
             <>
-            <span className="w-full h-full flex flex-col justify-between items-center bg-zinc-850 rounded-tr-2xl">
+            <span className="w-full h-full flex flex-col justify-between items-center bg-zinc-850 rounded-tr-2xl z-50">
                 <span className="w-full h-16  flex justify-between items-center">
                     <span className="flex items-center">
                         <img src={chatUser?.photoURL? chatUser.photoURL : ""} alt="sender image" className="w-12 h-12 rounded-full"/>
@@ -199,8 +204,9 @@ export default function Dashboard({user, setUser}){
                         <BiPlus className="text-lg"/>
                         </span>
                         }
-                    </span>
-                <span className="w-full h-full overflow-y-auto rounded-2xl bg-zinc-800">
+                </span>
+                
+                <span className="w-full h-full overflow-y-auto rounded-2xl bg-zinc-800 relative">
                 {
                     allMesseges && Object.values(allMesseges).map(
                         msg=><div key={msg.messegeId} className=" flex flex-col justify-center py-2">
@@ -224,13 +230,16 @@ export default function Dashboard({user, setUser}){
                         </div>
                     )   
                 }
-                <CanvasComponent chatUser={chatUser} user={user}/>
                 <div ref={targetRef}/>
+                <div className="absolute w-full h-full top-0">{isCanvasOpened && <CanvasComponent chatUser={chatUser} user={user} setIsCanvasOpened={setIsCanvasOpened}/>}</div>
                 </span>
-                <span className="flex w-full h-16 items-center justify-center backdrop-blur-lg">
-                    <input type="text" className="bg-transparent w-3/4 h-10" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
+                <span className="flex w-full h-20 items-center justify-center backdrop-blur-lg">
+                    <BiPlus className="inputb"/>
+                    <BiPaint className="inputb" onClick={()=>setIsCanvasOpened(true)}/>
+                    <input type="text" className="bg-transparent w-3/4 h-10 bg-zinc-875 px-4 rounded-full" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
                     <button onClick={()=>{sendmessege(); checkStranger();}}>Send</button>
                 </span>
+                
             </span></>:
             <span className="w-full h-3/4 flex">
                 <p>Select a chat</p>
