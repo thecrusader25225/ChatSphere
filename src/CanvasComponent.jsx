@@ -14,6 +14,7 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
     // const [color, setColor] = useState('black');
     const [pencilProperties, setPencilProperties]=useState({color:"#000000", thickness:5})
     const [eraserProperties, setEraserProperties]=useState({thickness: 5})
+    const [prevColor, setPrevColor]=useState("black")
     // const tempLinesArr=useRef([])
     const [tempLinesArr, setTempLinesArr]=useState([])
     const roomName = chatUser.uid > user.uid ? `${chatUser.uid}_${user.uid}` : `${user.uid}_${chatUser.uid}`;
@@ -143,7 +144,16 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
 
             get(ref(db, `rooms/${roomName}/lines`)).then(snapshot=>{
                     const data=Object.values(snapshot.val() || [])
-                    set(ref(db, `rooms/${roomName}/lines`),[...data, ...tempLinesArr])
+                    let filteredData=data;
+                    // if(data!=[]){
+                    //     //removing white lines coords
+                    //     filteredData=data.filter((d, index, arr)=>{
+                    //         if(arr[index+4]!='white' && arr[index+3]!='white' && arr[index+2]!='white' && arr[index+1]!='white' && arr[index]!='white' && arr[index-1]!='white')
+                    //             return d
+                    //     })
+                    // }
+                    console.log("data without whites", filteredData)
+                    set(ref(db, `rooms/${roomName}/lines`),[...filteredData, ...tempLinesArr])
             })
             setTempLinesArr([]); // Clear the temporary array
             console.log("lines pushed");
@@ -163,7 +173,7 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
     useEffect(()=>{
         if(tools.eraser)
            setPencilProperties(prev=>({...prev, color:'white'}))
-        else setPencilProperties(prev=>({...prev, color:'black'}))
+        else setPencilProperties(prev=>({...prev, color:prevColor}))
         console.log(tools)
     },[tools])
     // console.log("tools", tools)
@@ -187,7 +197,7 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
                     <span className="flex justify-center items-center">
                         {
                             thicknesses.map(thickness=><button
-                                className={` rounded-full p-1 mx-1 ${thickness===pencilProperties.thickness && "border border-white"} bg-black hover:bg-opacity-30 bg-opacity-10`}
+                                className={` rounded-full flex justify-center items-center ${thickness===pencilProperties.thickness && "border border-white"} bg-black hover:bg-opacity-30 bg-opacity-10 w-12 h-12`}
                                 key={thickness}
                                 onClick={()=>{setPencilProperties(prev=>({...prev, thickness:thickness})); setEraserProperties(prev=>({...prev, thickness:thickness}))}}>
                                     <div style={{width:`${thickness}px`, height:`${thickness}px`, backgroundColor:pencilProperties.color}} className="rounded-full"/>
@@ -196,12 +206,15 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
                         }
                     </span>
                 </div>
-                <div className="w-12 h-12" style={{backgroundColor:pencilProperties.color}}/>
+                <div className="w-12 h-12" style={{backgroundColor:prevColor}}/>
                 <div className="flex  w-1/2 max-w-48 h-full overflow-y-auto flex-wrap">
                         {
                             colorPalette.map((color,i)=><><button 
                             style={{backgroundColor:color}} 
-                            onClick={()=>{setPencilProperties(prev=>({...prev, color:color})); }} 
+                            onClick={()=>{ tools.eraser && setTools({pencil:true, eraser:false}); 
+                            setPencilProperties(prev=>({...prev, color:color})); 
+                            setPrevColor(color)
+                        }} 
                             className={`w-5 h-5 rounded-full p-2 m-0.5 ${color===pencilProperties.color && 'border'}`} />
                             
                             </>)
