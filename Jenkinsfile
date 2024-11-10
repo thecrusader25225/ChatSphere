@@ -6,7 +6,10 @@ pipeline {
     stages {
         stage('Build') {
             agent {
-                label 'build-agent' // Using a specific agent for the build stage
+                // label 'build-agent' // Using a specific agent for the build stage
+                docker{
+                    image 'shane25225/node-java-image'
+                }
             }
             steps {
                 sh 'echo "installing dependencies"'
@@ -34,7 +37,10 @@ pipeline {
        // }
         stage('Docker Build') {
             agent {
-                label 'docker-agent' // Using a specific agent for the Docker build stage
+                // label 'docker-agent' // Using a specific agent for the Docker build stage
+                 docker{
+                    image 'shane25225/node-java-image'
+                }
             }
             steps {
                 sh 'echo "docker build started"' // Log message indicating build start
