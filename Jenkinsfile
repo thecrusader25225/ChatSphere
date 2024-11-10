@@ -1,7 +1,7 @@
 pipeline {
     agent none // We will define agents for each stage
     triggers {
-        pollSCM 'H/* * * * *' // This will trigger the pipeline every minute at a random minute
+        pollSCM ('H/1 * * * *') // This will trigger the pipeline every minute at a random minute
     }
     stages {
         stage('Build') {
