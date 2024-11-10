@@ -8,7 +8,7 @@ pipeline {
             agent {
                 // label 'build-agent' // Using a specific agent for the build stage
                 docker{
-                    image 'shane25225/node-java-image'
+                    image 'shane25225/node-java-image:latest'
                 }
             }
             steps {
