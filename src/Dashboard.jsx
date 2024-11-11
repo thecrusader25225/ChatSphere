@@ -94,13 +94,14 @@ export default function Dashboard({user, setUser}){
         get(query(ref(db, `rooms/${roomName}/messeges/`), orderByKey(), endAt(Object.keys(allMesseges)[0]), limitToLast(11))).then(snapshot=>{
             if(snapshot.exists()){
                 const data=snapshot.val();
-                const tempArr=Object.keys(data);
-                tempArr.splice(-1, 1)
+                const tempArr=Object.keys(data).splice(-1, 1)
                 const editedData={...tempArr}
                 setAllMesseges(prev=>({...data, ...prev}))
             }
         })
         // console.log("all msgs",allMesseges)
+        if(chatContainerRef.current)
+            chatContainerRef.current.scrollTop=5
     }
 
     useEffect(()=>{
@@ -244,7 +245,7 @@ export default function Dashboard({user, setUser}){
                 </span>
                 
                 {/* messeging area */}
-                <span id="chatContainer" ref={chatContainerRef} className="w-full h-full overflow-y-auto rounded-2xl bg-zinc-800 relative">
+                <span ref={chatContainerRef} className="w-full h-full overflow-y-auto rounded-2xl bg-zinc-800 relative">
                 {
                     allMesseges && Object.values(allMesseges).map(
                         msg=><div key={msg.messegeId} className=" flex flex-col justify-center py-2">
