@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 
 export default function Friends({ user, setChatUser, chatUser, setAllMesseges, setIsChatOpened, allFriends, setAllFriends }) {
    
-
     // Fetch friends data from the database
     useEffect(() => {
         const unsubscribe = onValue(ref(db, `users/${user?.uid}/friends/`), snapshot => {
@@ -15,12 +14,12 @@ export default function Friends({ user, setChatUser, chatUser, setAllMesseges, s
             }
         });
 
-        return () => unsubscribe(); // Cleanup the listener on unmount
+        return () => unsubscribe(); 
     }, [user]);
 
-    // When chatUser changes, fetch the messages for the selected friend
+    //fetch msgs for the room with that frnd selected
     useEffect(() => {
-        if (!chatUser) return; // Exit if no chatUser is selected
+        if (!chatUser) return; 
 
         const roomName = chatUser.uid > user.uid ? `${chatUser.uid}_${user.uid}` : `${user.uid}_${chatUser.uid}`;
 
@@ -31,11 +30,11 @@ export default function Friends({ user, setChatUser, chatUser, setAllMesseges, s
                 setIsChatOpened(true)
             } else {
                 console.log("No messages found");
-                setAllMesseges([]); // Clear messages if none found
+                setAllMesseges([]); 
             }
         });
 
-        return () => unsubscribe(); // Cleanup the listener on unmount
+        return () => unsubscribe(); 
     }, [chatUser, user, setAllMesseges]);
 
     return (

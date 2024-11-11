@@ -274,7 +274,6 @@ export default function Dashboard({user, setUser}){
                 </span>
                 
                 <span className="flex w-full h-20 items-center justify-center backdrop-blur-lg">
-                    <button onClick={fetchMoreMsgs}>Load more</button>
                     <BiPlus className="inputb"/>
                     <BiPaint className="inputb" onClick={()=>setIsCanvasOpened(true)}/>
                     <input type="text" className="bg-transparent w-3/4 h-10 bg-zinc-875 px-4 rounded-full" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
