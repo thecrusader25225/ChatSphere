@@ -87,13 +87,14 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
                  //smooth line properties
                 ctx.lineJoin = 'round';
                 ctx.lineCap = 'round';
-                for(let i=0;i<data.length;i+=6)
+                for(let i=0;i<data.length;i++)
                 {
+                    let k=0;
                     ctx.beginPath();
-                    ctx.moveTo(data[i], data[i+1]);
-                    ctx.lineTo(data[i+2], data[i+3]);
-                    ctx.strokeStyle =data[i+4];
-                    ctx.lineWidth = data[i+5];
+                    ctx.moveTo(data[i][k], data[i][k+1]);
+                    ctx.lineTo(data[i][k+2], data[i][k+3]);
+                    ctx.strokeStyle =data[i][k+4];
+                    ctx.lineWidth = data[i][k+5];
                     ctx.stroke();
                     ctx.closePath();
                 }
@@ -132,7 +133,7 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
     
         // Update the tempLinesArr with the new line as an array
         const newLine = [ctx.currentX, ctx.currentY, offsetX, offsetY, pencilProperties.color, pencilProperties.thickness];
-        setTempLinesArr(prev => [...prev, ...newLine]); // Append the new line array to tempLinesArr
+        setTempLinesArr(prev => [...prev, newLine]); // Append the new line array to tempLinesArr
     
         // Set a timeout to push to Firebase
         timerRef.current = setTimeout(() => {
