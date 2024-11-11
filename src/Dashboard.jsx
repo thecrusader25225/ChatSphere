@@ -24,6 +24,7 @@ export default function Dashboard({user, setUser}){
     const [allFriends, setAllFriends] = useState(null);
     const [isChatOrFriendOpen, setIsChatOrFriendOpen]=useState({chat:true, friend:false})
     const [isCanvasOpened, setIsCanvasOpened]=useState(false)
+    const chatContainerRef=useRef(null)
 
     useEffect(()=>{
         const unsubscribe=onAuthStateChanged(auth, currentUser=>{
@@ -101,7 +102,21 @@ export default function Dashboard({user, setUser}){
         })
         // console.log("all msgs",allMesseges)
     }
-    console.log("messege[0]", Object.keys(allMesseges)[0])
+
+    useEffect(()=>{
+        const handleScroll=()=>
+        {
+            if(chatContainerRef.current)
+                if(chatContainerRef.current.scrollTop==0)
+                    fetchMoreMsgs()
+        }
+        if(chatContainerRef.current)
+            chatContainerRef.current.addEventListener("scroll", handleScroll)
+
+        return ()=>{if(chatContainerRef.current)chatContainerRef.current.removeEventListener("scroll", handleScroll)}
+        
+    }, [allMesseges])
+    // console.log("messege[0]", Object.keys(allMesseges)[0])
     function addFriend(){
         const reference=ref(db, `users/${user.uid}/friends/${chatUser.uid}`)
         get(query(reference)).then(snapshot=>{
@@ -229,7 +244,7 @@ export default function Dashboard({user, setUser}){
                 </span>
                 
                 {/* messeging area */}
-                <span className="w-full h-full overflow-y-auto rounded-2xl bg-zinc-800 relative">
+                <span id="chatContainer" ref={chatContainerRef} className="w-full h-full overflow-y-auto rounded-2xl bg-zinc-800 relative">
                 {
                     allMesseges && Object.values(allMesseges).map(
                         msg=><div key={msg.messegeId} className=" flex flex-col justify-center py-2">
