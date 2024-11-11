@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase-config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { get, onValue, push, query, ref, remove, set, update } from "firebase/database";
+import { endAt, get, limitToLast, onValue, orderByChild, orderByKey, push, query, ref, remove, set, update } from "firebase/database";
 import { useEffect, useRef, useState } from "react";
 import SearchBox from "./SearchBox";
 import Friends from "./Friends";
@@ -69,17 +69,39 @@ export default function Dashboard({user, setUser}){
             return; // Exit the function if chatUser is null
         }
         const roomName=chatUser.uid>user.uid?chatUser.uid+'_'+user.uid:user.uid+'_'+chatUser.uid;
-        onValue(ref(db, `rooms/${roomName}/messeges/`),snapshot=>{
-            if(snapshot.exists())
+        
+        get(query(ref(db, `rooms/${roomName}/messeges/`), orderByKey(), limitToLast(10))).then(snapshot=>{
+            if(snapshot.exists()){
                 setAllMesseges(snapshot.val())
-            else console.log("No msgs found")
+                console.log("allmsgs", allMesseges)
+            }else console.log("no msgs found")
         })
-        console.log("all msgs",allMesseges)
+        // console.log("all msgs",allMesseges)
     },[messege, chatUser])
     useEffect(()=>{
         setIsCanvasOpened(false)
     },[chatUser])
 
+    console.log("all msgs", allMesseges)
+
+    function fetchMoreMsgs(){
+        if (!chatUser) {
+            console.error("Chat user is not selected.");
+            return; // Exit the function if chatUser is null
+        }
+        const roomName=chatUser.uid>user.uid?chatUser.uid+'_'+user.uid:user.uid+'_'+chatUser.uid;
+        get(query(ref(db, `rooms/${roomName}/messeges/`), orderByKey(), endAt(Object.keys(allMesseges)[0]), limitToLast(11))).then(snapshot=>{
+            if(snapshot.exists()){
+                const data=snapshot.val();
+                const tempArr=Object.keys(data);
+                tempArr.splice(-1, 1)
+                const editedData={...tempArr}
+                setAllMesseges(prev=>({...data, ...prev}))
+            }
+        })
+        // console.log("all msgs",allMesseges)
+    }
+    console.log("messege[0]", Object.keys(allMesseges)[0])
     function addFriend(){
         const reference=ref(db, `users/${user.uid}/friends/${chatUser.uid}`)
         get(query(reference)).then(snapshot=>{
@@ -113,12 +135,12 @@ export default function Dashboard({user, setUser}){
                 const messages = snapshot.val();
                 const messageCount = Object.keys(messages).length; // Count the number of messages
     
-                console.log("Message count:", messageCount); // Debugging log
+                console.log("Message count:", messageCount); 
     
                 // Check if the user is a friend
                 get(query(ref(db, `users/${chatUser.uid}/friends/${user.uid}`))).then(friendSnapshot => {
                     const isFriend = friendSnapshot.exists();
-                    console.log("Is friend:", isFriend); // Debugging log
+                    console.log("Is friend:", isFriend); 
     
                     if (!isFriend && messageCount <= 1) { // Adjusted condition
                         const notificationRef = ref(db, `users/${chatUser.uid}/notifications/${user.uid}`);
@@ -206,6 +228,7 @@ export default function Dashboard({user, setUser}){
                         }
                 </span>
                 
+                {/* messeging area */}
                 <span className="w-full h-full overflow-y-auto rounded-2xl bg-zinc-800 relative">
                 {
                     allMesseges && Object.values(allMesseges).map(
@@ -230,10 +253,12 @@ export default function Dashboard({user, setUser}){
                         </div>
                     )   
                 }
-                <div ref={targetRef}/>
-                <div className="absolute w-full h-full top-0">{isCanvasOpened && <CanvasComponent chatUser={chatUser} user={user} setIsCanvasOpened={setIsCanvasOpened}/>}</div>
+                    <div ref={targetRef}/>
+                    <div className="absolute w-full h-full top-0">{isCanvasOpened && <CanvasComponent chatUser={chatUser} user={user} setIsCanvasOpened={setIsCanvasOpened}/>}</div>
                 </span>
+                
                 <span className="flex w-full h-20 items-center justify-center backdrop-blur-lg">
+                    <button onClick={fetchMoreMsgs}>Load more</button>
                     <BiPlus className="inputb"/>
                     <BiPaint className="inputb" onClick={()=>setIsCanvasOpened(true)}/>
                     <input type="text" className="bg-transparent w-3/4 h-10 bg-zinc-875 px-4 rounded-full" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
