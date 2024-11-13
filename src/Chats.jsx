@@ -2,7 +2,7 @@ import { get, query, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 import { db } from "../firebase-config";
 
-export default function Chats({user, setChatUser}){
+export default function Chats({user, setChatUser, setIsChatOpened}){
     const [allChats, setAllChats]=useState([])
     useEffect(()=>{
         get(ref(db, `rooms`)).then(snapshot=>{
@@ -17,6 +17,7 @@ export default function Chats({user, setChatUser}){
                         if(snap.exists()){
                             console.log("Chat users exist", snap.val())
                             const info=snap.val()
+                            setIsChatOpened(true)
                             console.log(info)
                            return {
                                 displayName:info.displayName,
@@ -31,6 +32,9 @@ export default function Chats({user, setChatUser}){
             }
         })
     },[user])
+    useEffect(()=>{
+
+    })
     console.log("allchats", allChats)
     return <div className="w-full h-2/3 flex flex-col overflow-y-auto">
         <p>Chats</p>

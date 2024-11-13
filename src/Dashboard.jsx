@@ -209,7 +209,7 @@ export default function Dashboard({user, setUser}){
                 if (isChatOpened) setIsChatOpened(false);
             }, 100); // You can adjust the timeout if needed
         }
-    }, [allMesseges, chatUser]); // Make sure to include `allMesseges` in the dependency array
+    }, [allMesseges, chatUser, isChatOpened]); // Make sure to include `allMesseges` in the dependency array
     
 
     return <>
@@ -221,7 +221,7 @@ export default function Dashboard({user, setUser}){
         <span className="w-1/3 h-full flex flex-col min-w-64 bg-zinc-850 rounded-tl-2xl rounded-bl-2xl">
             <SearchBox chatUser={chatUser} setChatUser={setChatUser} user={user}/>   
             {isChatOrFriendOpen.friend && <Friends user={user} chatUser={chatUser} setChatUser={setChatUser} setAllMesseges={setAllMesseges} allMesseges={allMesseges} messege={messege} setIsChatOpened={setIsChatOpened} allFriends={allFriends} setAllFriends={setAllFriends}/>}
-            {isChatOrFriendOpen.chat && <Chats user={user} setChatUser={setChatUser}/>}
+            {isChatOrFriendOpen.chat && <Chats user={user} setChatUser={setChatUser} setIsChatOpened={setIsChatOpened}/>}
         </span>
         <span className="flex justify-between flex-col w-3/4 h-full">
             {chatUser? 

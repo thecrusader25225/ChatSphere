@@ -146,14 +146,14 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
             get(ref(db, `rooms/${roomName}/lines`)).then(snapshot=>{
                     const data=Object.values(snapshot.val() || [])
                     let filteredData=data;
-                    // if(data!=[]){
+                    // TODO --> 1. Delete the bottom lines if a line overlaps another line
+                    //          2. Delete the white color lines                    
+                    
+                    // if(filteredData!=[]){
                     //     //removing white lines coords
-                    //     filteredData=data.filter((d, index, arr)=>{
-                    //         if(arr[index+4]!='white' && arr[index+3]!='white' && arr[index+2]!='white' && arr[index+1]!='white' && arr[index]!='white' && arr[index-1]!='white')
-                    //             return d
-                    //     })
+                    //     filteredData=filteredData.filter(d=>d[4]!="white" && d[4]!="#FFFFFF")
                     // }
-                    console.log("data without whites", filteredData)
+                    console.log("data", filteredData)
                     set(ref(db, `rooms/${roomName}/lines`),[...filteredData, ...tempLinesArr])
             })
             setTempLinesArr([]); // Clear the temporary array
@@ -163,9 +163,7 @@ export default function CanvasComponent({ chatUser, user, setIsCanvasOpened }) {
         // Update current coordinates for the next line segment
         ctx.currentX = offsetX;
         ctx.currentY = offsetY;
-    }
-    
-
+    } 
     function stopDrawing() {
         setIsDrawing(false);
         ctx.closePath(); // Ensure the path is closed after drawing
