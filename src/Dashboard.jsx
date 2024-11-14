@@ -13,6 +13,8 @@ import { TiTick } from "react-icons/ti";
 import Chats from "./Chats";
 import CanvasComponent from "./CanvasComponent";
 import { BsPlus } from "react-icons/bs";
+import { upload } from "@vercel/blob/client";
+import { handleUpload } from "@vercel/blob/client";
 export default function Dashboard({user, setUser}){
     const navigate=useNavigate()
     const [username, setUsername]=useState("")
@@ -25,6 +27,9 @@ export default function Dashboard({user, setUser}){
     const [isChatOrFriendOpen, setIsChatOrFriendOpen]=useState({chat:true, friend:false})
     const [isCanvasOpened, setIsCanvasOpened]=useState(false)
     const chatContainerRef=useRef(null)
+
+    const inputFileRef=useRef(null)
+    const [blob, setBlob]=useState(null)
 
     useEffect(()=>{
         const unsubscribe=onAuthStateChanged(auth, currentUser=>{
@@ -211,7 +216,27 @@ export default function Dashboard({user, setUser}){
         }
     }, [allMesseges, chatUser]); // Make sure to include `allMesseges` in the dependency array
     
-
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+    
+        const file = inputFileRef.current.files[0];
+        if (!file) return; // Handle if no file is selected
+        
+        try {
+          // Call Vercel Blob API's handleUpload function
+          const newBlob = await handleUpload(file.name, file, {
+            access: 'public', // Can adjust this based on your needs
+            handleUploadUrl: '/api/avatar/upload', // This is your backend URL
+          });
+    
+          // Store the uploaded blob URL or data if needed
+          setBlob(newBlob);
+          console.log('File uploaded successfully:', newBlob);
+        } catch (error) {
+          console.error('Error uploading file:', error);
+        }
+      };
+    
     return <>
     <Navbar username={username} setUsername={setUsername} user={user} setChatUser={setChatUser} setIsChatorFriendOpen={setIsChatOrFriendOpen} isChatOrFriendOpen={isChatOrFriendOpen}/>
     <div className="absolute top-0 left-0 w-full h-12 bg-zinc-900 flex justify-center items-center">Chat Sphere</div>
@@ -274,7 +299,10 @@ export default function Dashboard({user, setUser}){
                 </span>
                 
                 <span className="flex w-full h-20 items-center justify-center backdrop-blur-lg">
-                    <BiPlus className="inputb"/>
+                    <form onSubmit={handleSubmit}>
+                        <input ref={inputFileRef} type="file" required />
+                        <button type="submit">Upload</button>
+                    </form>
                     <BiPaint className="inputb" onClick={()=>setIsCanvasOpened(true)}/>
                     <input type="text" className="bg-transparent w-3/4 h-10 bg-zinc-875 px-4 rounded-full" placeholder="Messege..." onChange={e=>setMessege(e.target.value)}/>
                     <button onClick={()=>{sendmessege(); checkStranger();}}>Send</button>
